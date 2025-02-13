@@ -6,5 +6,6 @@ __项目名__：SoulPlay AI
 
 ## 参考 
 __牌谱屋__: https://amae-koromo.sapk.ch/  
+__牌谱获取__：https://mjai.ekyu.moe/zh-cn.html  
 __MahjongAI__: https://github.com/erreurt/MahjongAI  
 __牌面识别__: https://github.com/Unarimit/mahjong-sol_recognition?tab=readme-ov-file
