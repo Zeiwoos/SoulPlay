@@ -2,7 +2,7 @@ import cv2
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-PATH = 'D:\\Code\\From_Pycharm\\SoulPlay\\SoulPlay\\Data\\recogition\\pic\\mahjong'
+PATH = '.\\Data\\recogition\\pic\\mahjong'
 
 
 class MahjongDetector:
