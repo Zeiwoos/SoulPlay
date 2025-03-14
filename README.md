@@ -3,6 +3,7 @@ __队伍名__：我不是牌佬
 
 __项目名__：SoulPlay AI
 
+__决策部分__: https://github.com/yeteye/MahjongCopilot             
 
 ## 参考 
 __牌谱屋__: https://amae-koromo.sapk.ch/                     （牌谱ID获取）   
