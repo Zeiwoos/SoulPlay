@@ -41,7 +41,7 @@ def save_img(the_class : str, img):
 
 
 if __name__ == '__main__':
-    img = cv2.imread('test/spilt2.png')
+    img = cv2.imread('./Main/test/spilt1.png')
     boxes = get_mahjongs_position(img)
     # TODO: 第一次取所有麻将均值
     detector = MahjongDetector(max(max(boxes[0][0][1], boxes[0][1][1], boxes[0][2][1], boxes[0][3][1]) - min(boxes[0][0][1], boxes[0][1][1], boxes[0][2][1], boxes[0][3][1]),
