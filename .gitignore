@@ -1,0 +1,8 @@
+.idea/
+.vscode/
+
+Data/recogition/output/
+
+# Xml文件
+*.xml
+
