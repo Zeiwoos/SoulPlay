@@ -3,8 +3,8 @@ import torch
 import cv2
 import os
 from torchvision import transforms
-PATH = 'pic/mahjong'
-DATA0_PATH = 'data0'
+PATH = 'Data/recogition/pic/mahjong'
+DATA0_PATH = 'Data/recogition/data0'
 
 
 class ImgDetectorDL:

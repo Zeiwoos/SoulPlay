@@ -7,10 +7,12 @@ PATH = '.\\Data\\recogition\\pic\\mahjong'
 
 class MahjongDetector:
     def __init__(self, img_height, white_center):
-        self.white_center = white_center
-        self.height = img_height
-        self.output_imgs = []
-        detector = cv2.SIFT_create(nfeatures=20)  # can adjust
+        self.white_center = white_center # 白板中心
+        self.height = img_height # 图像高度
+        self.output_imgs = [] # 输出图像
+        # 特征检测器，作用：检测图像中的关键点（如角点、边缘等），并计算它们的特征描述符，值越大，特征越明显
+        detector = cv2.SIFT_create(nfeatures=200) 
+        # 特征描述符计算器，作用：计算图像中关键点的特征描述符，描述符是关键点周围区域的图像特征
         computer = cv2.SIFT_create()
         # detector = cv2.ORB_create()
         files = os.listdir(PATH)

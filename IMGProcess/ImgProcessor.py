@@ -4,18 +4,19 @@ import cv2
 from ImgDetector import MahjongDetector
 
 
-def get_mahjongs_position(img):
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+def get_mahjongs_position(img): # 获取麻将牌位置
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) # 将图像转换为灰度图像
+    cv2.imshow("123", gray)
     thresh = gray
     # 白色区域为255， 将图像二值化 +- 10 误差
-    thresh = np.zeros_like(gray)
-    for i in range(19, 25, 2):
-        thresh += cv2.inRange(img, (i*10, i*10, i*10), (i*10+20, i*10+20, i*10+20))
+    thresh = np.zeros_like(gray) # 创建一个与gray形状相同的零矩阵
+    for i in range(19, 25, 2): # 遍历19到25之间的偶数
+        thresh += cv2.inRange(img, (i*10, i*10, i*10), (i*10+20, i*10+20, i*10+20)) # 将图像中符合条件的像素值设置为255
     cv2.imshow("123", thresh)
 
     # 画轮廓
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)  # 得到轮廓信息
-    boxes = []
+    boxes = [] 
     for i in range(len(contours)):
         area = cv2.contourArea(contours[i])
         if area < 300:  # 小于300像素面积不保存
@@ -30,7 +31,7 @@ def get_mahjongs_position(img):
 
 # make data to do machine learning
 import uuid
-def save_img(the_class : str, img):
+def save_img(the_class : str, img): # 保存图片
     data_src = 'data'
     if not os.path.exists(data_src):
         os.mkdir(data_src)
@@ -58,7 +59,6 @@ if __name__ == '__main__':
     cv2.waitKey(0)
     '''
 
-
     padding = 1
     for i, box in enumerate(boxes):
         max_x = max(box[0][1], box[1][1], box[2][1], box[3][1])
@@ -78,6 +78,3 @@ if __name__ == '__main__':
     cv2.imshow('convexHull', img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-#rocognition部分主程序
-

@@ -5,7 +5,7 @@ import os
 
 # 图片文件夹
 img_folder = "Data\\recogition\\IMG"
-output_folder = "Data\\recogition\\output"
+output_folder = "Data\\recogition\\output_first"
 
 def find_all_cards_in_region(img, regions):
     h_img, w_img = img.shape[:2]
@@ -99,7 +99,7 @@ def safe_rect(ratios, h, w):
     return (x1, y1, x2, y2)
 
 # 保存切割的区域
-def save_cropped_regions(img, hand_regions, img_name):
+def save_cropped_regions(img, hand_regions, img_name, h_img, w_img):
     """
     根据检测到的麻将牌区域，裁剪并保存图片
     """
@@ -110,7 +110,7 @@ def save_cropped_regions(img, hand_regions, img_name):
     os.makedirs(img_output_path, exist_ok=True)
 
     for key, x, y, w, h in hand_regions:
-        cropped_img = img[y:y+h, x:x+w]  # 裁剪区域
+        cropped_img = img[max(0, y-20):min(h_img, y+h+20), max(0, x-20):min(w_img, x+w+20)]  # 裁剪区域
         save_path = os.path.join(img_output_path, f"{key}_{img_name}")  # 保存路径
         cv2.imwrite(save_path, cropped_img)  # 保存图片
         print(f"已保存: {save_path}")
@@ -142,7 +142,7 @@ if __name__ == "__main__":
         hand_regions = find_all_cards_in_region(img, regions)
         # print("检测到的麻将牌区域:", hand_regions)
 
-        save_cropped_regions(img, hand_regions, file)
+        save_cropped_regions(img, hand_regions, file, h, w)
 
         # # 绘制检测结果
         # result_img = img.copy()
