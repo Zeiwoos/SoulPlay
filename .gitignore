@@ -1,8 +1,8 @@
 .idea/
 .vscode/
 
-Data/recogition/output/
-
 # Xml文件
 *.xml
 
+
+IMGProcess/__pycache__
