@@ -36,7 +36,7 @@ def processImg(img_folder, first_processed_img_folder, second_processed_img_fold
                     'Self_Mingpai': {'rect': safe_rect((0.12, 0.82, 1, 1.0), h, w), 'color': (0, 255, 255) },# 青色
                     'Second_Mingpai': {'rect': safe_rect((0.70, 0.03, 0.89, 0.6), h, w), 'color': (255, 140, 0) },# 深橙色
                     'Third_Mingpai': {'rect': safe_rect((0.20, 0, 0.60, 0.10), h, w), 'color': (255, 0, 255) },# 洋红色
-                    'Fourth_Mingpai': {'rect': safe_rect((0.03, 0.3, 0.25, 0.88), h, w), 'color': (128, 0, 128) },# 紫色
+                    'Fourth_Mingpai': {'rect': safe_rect((0.03, 0.3, 0.25, 0.879), h, w), 'color': (128, 0, 128) },# 紫色
                     # 弃牌区域
                     'Self_Discard': {'rect': safe_rect((0.39, 0.497, 0.63, 0.70), h, w), 'color': (0, 255, 0) },# 绿色
                     'Second_Discard': {'rect': safe_rect((0.57, 0.18, 0.75, 0.50), h, w), 'color': (0, 128, 255) },# 天蓝色

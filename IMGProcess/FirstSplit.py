@@ -36,7 +36,7 @@ def find_all_cards_in_region(img, regions):
         # 转换为 HSV 颜色空间
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
         
-        if key == 'wind':
+        if key == 'Wind':
             continue
 
         lower_bound = np.array([0, 0, 180])
@@ -45,10 +45,10 @@ def find_all_cards_in_region(img, regions):
         # 颜色过滤
         mask = cv2.inRange(hsv, lower_bound, upper_bound)
             
-        kernel_size = 9 if key == 'hand_tiles' else 3
+        kernel_size = 15 if key == 'Hand_Tiles' else 3
         kernel = np.ones((kernel_size, kernel_size), np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.dilate(mask, kernel, iterations=3 if key != 'hand_tiles' else 5)
+        mask = cv2.dilate(mask, kernel, iterations=5 if key != 'Hand_Tiles' else 3)
 
         # 轮廓检测
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -57,10 +57,10 @@ def find_all_cards_in_region(img, regions):
 
         # 筛选麻将牌区域
         if len(contours) > 0 :
-            if key == 'hand_tiles':
+            if key == 'Hand_Tiles':
                 # 选出最左侧的轮廓
                 selected_contour = min(contours, key=lambda c: cv2.boundingRect(c)[0])
-            elif key == 'self_Mingpai':
+            elif key == 'Self_Mingpai':
                 # 选出最右侧的轮廓，并确保其右边界 >= 手牌右边界
                 selected_contour = max(contours, key=lambda c: cv2.boundingRect(c)[0])
                 x, _, w, _ = cv2.boundingRect(selected_contour)
@@ -68,11 +68,11 @@ def find_all_cards_in_region(img, regions):
                     selected_contour = None
             else:
                 # 根据不同的 `key` 进行筛选
-                if key == 'second_Mingpai':
+                if key == 'Second_Mingpai':
                     contours = [c for c in contours if (cv2.boundingRect(c)[1] + y1) < (0.15 * h_img)] # 上边界
-                elif key == 'third_Mingpai':
+                elif key == 'Third_Mingpai':
                     contours = [c for c in contours if (cv2.boundingRect(c)[0] + x1) < (0.3 * w_img)] # 左边界
-                elif key == 'fourth_Mingpai':
+                elif key == 'Fourth_Mingpai':
                     contours = [c for c in contours if (cv2.boundingRect(c)[1] + y1 + cv2.boundingRect(c)[3]) > (0.85 * h_img)]
                 
                 selected_contour = max(contours, key=cv2.contourArea, default=None) if contours else None

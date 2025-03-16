@@ -25,11 +25,11 @@ def get_mahjongs_contours(img, img_name):
         # 长和宽均30
         if area < 250 or w < 20 or h < 20 or hierarchy[0][i][3] != -1 :
             continue
-        if "fourth_Mingpai" in img_name:
+        if "Fourth_Mingpai" in img_name:
             # 删除与右下角重叠的轮廓
             if x + w > 0.95 * img.shape[1] and y + h > 0.95 * img.shape[0]:
                 continue
-        if "second_Mingpai" in img_name:
+        if "Second_Mingpai" in img_name:
             # 删除与左上角重叠的轮廓
             if x < 0.05 * img.shape[1] and y < 0.05 * img.shape[0]:
                 continue
