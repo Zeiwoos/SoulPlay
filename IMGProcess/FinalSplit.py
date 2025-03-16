@@ -23,7 +23,7 @@ def get_mahjongs_contours(img, img_name):
         x, y, w, h = cv2.boundingRect(contours[i])
         aspect_ratio = max(w, h) / min(w, h)
         # 长和宽均30
-        if area < 250 or hierarchy[0][i][3] != -1 :
+        if area < 250 or w < 20 or h < 20 or hierarchy[0][i][3] != -1 :
             continue
         if "fourth_Mingpai" in img_name:
             # 删除与右下角重叠的轮廓
@@ -36,8 +36,6 @@ def get_mahjongs_contours(img, img_name):
         rect = cv2.minAreaRect(contours[i])
         box = cv2.boxPoints(rect)
         valid_boxes.append(np.int64(box))
-
-            #
 
     return valid_boxes
 
@@ -59,7 +57,6 @@ def extract_tiles(img, img_name):
         
         tile_img = img[min_x+padding:max_x-padding, min_y+padding:max_y-padding].copy()
         tiles.append(tile_img)
-        # print(f"Tile size: {tile_img.shape}")  # 打印图像尺寸
     
     return tiles
 
@@ -75,11 +72,8 @@ def process_folder(input_folder, output_folder):
             if file.lower().endswith(('png', 'jpg', 'jpeg')):
                 img_path = os.path.join(root, file)
                 img = cv2.imread(img_path)
-                if img is None:
-                    continue
             
                 tiles = extract_tiles(img, file)
-                
                 
                 # 创建对应的子文件
                 if tiles:
@@ -95,11 +89,5 @@ def process_folder(input_folder, output_folder):
                 # 保存切割出的麻将牌图像
                 for i, tile in enumerate(tiles):
                     tile_path = os.path.join(subfolder_path, f'{i}.png')
-                    cv2.imshow(f'Tile {i}', tile)
                     cv2.imwrite(tile_path, tile)
                 print(f"处理完成: {file}, 生成 {len(tiles)} 张麻将牌。")
-
-if __name__ == '__main__':
-    input_folder = 'Data/recogition/output_first/Phone'
-    output_folder = 'Data/recogition/output_final/'
-    process_folder(input_folder, output_folder)

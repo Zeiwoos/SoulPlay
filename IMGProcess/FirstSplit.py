@@ -4,10 +4,6 @@ import paddleocr
 import os
 import logging
 
-# 图片文件夹
-img_folder = "Data\\recogition\\IMG\\Phone"
-output_folder = "Data\\recogition\\output_first\\Phone"
-
 # 屏蔽 PaddleOCR 的调试信息
 logging.getLogger("ppocr").setLevel(logging.ERROR)
 
@@ -27,6 +23,9 @@ def recognize_wind(roi):
 
 def find_all_cards_in_region(img, regions):
     h_img, w_img = img.shape[:2]
+    # cv2.imshow('img', img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     hand_regions = []
     
     for key, region in regions.items():
@@ -38,9 +37,6 @@ def find_all_cards_in_region(img, regions):
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
         
         if key == 'wind':
-            # 识别风牌
-            wind = recognize_wind(roi)
-            print(wind)
             continue
 
         lower_bound = np.array([0, 0, 180])
@@ -73,29 +69,21 @@ def find_all_cards_in_region(img, regions):
             else:
                 # 根据不同的 `key` 进行筛选
                 if key == 'second_Mingpai':
-                    contours = [c for c in contours if (cv2.boundingRect(c)[1] + y1) < (0.15 * h_img)]
+                    contours = [c for c in contours if (cv2.boundingRect(c)[1] + y1) < (0.15 * h_img)] # 上边界
                 elif key == 'third_Mingpai':
-                    contours = [c for c in contours if (cv2.boundingRect(c)[0] + x1) < (0.3 * w_img)]
+                    contours = [c for c in contours if (cv2.boundingRect(c)[0] + x1) < (0.3 * w_img)] # 左边界
                 elif key == 'fourth_Mingpai':
                     contours = [c for c in contours if (cv2.boundingRect(c)[1] + y1 + cv2.boundingRect(c)[3]) > (0.85 * h_img)]
                 
                 selected_contour = max(contours, key=cv2.contourArea, default=None) if contours else None
             
+            # 如果轮廓不为空，则获取轮廓的边界矩形
             if selected_contour is not None:
                 x, y, w, h = cv2.boundingRect(selected_contour)
                 if w > 25 and h > 25:
                     hand_regions.append((key, x + x1, y + y1, w, h))
 
     return hand_regions
-
-def draw_regions(img, hand_regions, regions):
-    for (key, x, y, w, h) in hand_regions:
-        if key in regions:  # 确保 key 存在于 regions
-            color = regions[key]['color']
-        else:
-            color = (255, 255, 255)  # 如果找不到，默认白色
-        cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
-        print(key)
 
 # 缩放图片适应屏幕
 def resize_for_display(image, max_width=1000, max_height=800):
@@ -114,7 +102,7 @@ def safe_rect(ratios, h, w):
     return (x1, y1, x2, y2)
 
 # 保存切割的区域
-def save_cropped_regions(img, hand_regions, img_name, h_img, w_img):
+def save_cropped_regions(img, hand_regions, img_name, output_folder):
     """
     根据检测到的麻将牌区域，裁剪并保存图片
     """
@@ -123,6 +111,8 @@ def save_cropped_regions(img, hand_regions, img_name, h_img, w_img):
 
     # 确保输出文件夹存在
     os.makedirs(img_output_path, exist_ok=True)
+
+    h_img, w_img = img.shape[:2]
 
     for key, x, y, w, h in hand_regions:
         cropped_img = img[max(0, y-15):min(h_img, y+h+15), max(0, x-15):min(w_img, x+w+15)]  # 裁剪区域
@@ -133,43 +123,4 @@ def save_cropped_regions(img, hand_regions, img_name, h_img, w_img):
         cv2.imwrite(save_path, cropped_img)  # 保存图片
         print(f"已保存: {save_path}")
 
-if __name__ == "__main__":
-    for file in os.listdir(img_folder):
-        img = cv2.imread(os.path.join(img_folder, file))
-        h, w = img.shape[:2]
-
-        regions = {
-            # 手牌区域
-            'hand_tiles': { 'rect': safe_rect((0.18, 0.82, 1, 1.0), h, w), 'color': (0, 0, 255) },# 蓝色
-            # 明牌区域
-            'self_Mingpai': {'rect': safe_rect((0.12, 0.82, 1, 1.0), h, w), 'color': (0, 255, 255) },# 青色
-            'second_Mingpai': {'rect': safe_rect((0.70, 0.03, 0.89, 0.6), h, w), 'color': (255, 140, 0) },# 深橙色
-            'third_Mingpai': {'rect': safe_rect((0.20, 0, 0.60, 0.10), h, w), 'color': (255, 0, 255) },# 洋红色
-            'fourth_Mingpai': {'rect': safe_rect((0.03, 0.3, 0.25, 0.88), h, w), 'color': (128, 0, 128) },# 紫色
-            # 弃牌区域
-            'self_discard': {'rect': safe_rect((0.39, 0.497, 0.63, 0.70), h, w), 'color': (0, 255, 0) },# 绿色
-            'Second_discard': {'rect': safe_rect((0.57, 0.18, 0.75, 0.50), h, w), 'color': (0, 128, 255) },# 天蓝色
-            'third_discard': {'rect': safe_rect((0.37, 0.115, 0.62, 0.27), h, w), 'color': (255, 0, 0) },# 红色
-            'fourth_discard': {'rect': safe_rect((0.22, 0.12, 0.42, 0.55), h, w), 'color': (128, 128, 0) },# 橄榄绿
-            # 宝牌指示牌
-            'dora_indicator': {'rect': safe_rect((0, 0.02, 0.12, 0.12), h, w), 'color': (255, 255, 0) },# 黄色
-            # 风位
-            'wind': {'rect': safe_rect((0.42, 0.455, 0.46, 0.50), h, w), 'color': (75, 0, 130) },# 靛蓝色
-        }
-        
-        hand_regions = find_all_cards_in_region(img, regions)
-        # print("检测到的麻将牌区域:", hand_regions)
-
-        save_cropped_regions(img, hand_regions, file, h, w)
-
-        # # 绘制检测结果
-        # result_img = img.copy()
-        # draw_regions(result_img, hand_regions, regions)
-
-        # # 调整图片大小以适应显示
-        # display_img = resize_for_display(result_img)
-
-        # # 显示结果
-        # cv2.imshow("Detected Mahjong Tiles", display_img)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
+    return img_output_path
