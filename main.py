@@ -1,9 +1,9 @@
-from FinalSplit import process_folder
-from FirstSplit import save_cropped_regions, recognize_word, find_all_cards_in_region, safe_rect
-from Draw import draw_regions, draw_original_regions
+from IMGProcess.FinalSplit import process_folder
+from IMGProcess.FirstSplit import save_cropped_regions, recognize_word, find_all_cards_in_region, safe_rect
+from IMGProcess.Draw import draw_regions, draw_original_regions
 import os
 import cv2
-from ActorDetector import detect_actor
+from IMGProcess.ActorDetector import detect_actor
 
 origin_img_folder = 'Data/recogition/IMG'
 first_processed_img_folder = 'Data/recogition/output_first/'
