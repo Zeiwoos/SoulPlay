@@ -62,7 +62,7 @@ def extract_tiles(img):
 
 if __name__ == '__main__':
     # 改为对文件夹操作
-    img = cv2.imread('Data\\recogition\output_first\Phone\phone5\phone5_third_Mingpai.jpg')  # 请替换为实际图片路径
+    img = cv2.imread('Data\\recogition\output_first\PC\pc3\pc3_Fourth_Mingpai.png')  # 请替换为实际图片路径
     tiles, img_with_boxes = extract_tiles(img)
     print(len(tiles))
     

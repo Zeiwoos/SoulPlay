@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import uuid
 import os
 
 def get_mahjongs_contours(img, img_name):
@@ -10,6 +9,10 @@ def get_mahjongs_contours(img, img_name):
     :return: 轮廓列表
     """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # cv2.imshow('gray', gray)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     
     thresh = np.zeros_like(gray)
     for i in range(19, 25, 2):
@@ -17,13 +20,13 @@ def get_mahjongs_contours(img, img_name):
     
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     valid_boxes = []
-
+    temp_boxes = []
     for i in range(len(contours)):
         area = cv2.contourArea(contours[i])
         x, y, w, h = cv2.boundingRect(contours[i])
         aspect_ratio = max(w, h) / min(w, h)
         # 长和宽均30
-        if area < 250 or w < 20 or h < 20 or hierarchy[0][i][3] != -1 :
+        if area < 250 or hierarchy[0][i][3] != -1 :
             continue
         if "Fourth_Mingpai" in img_name:
             # 删除与右下角重叠的轮廓
@@ -35,7 +38,9 @@ def get_mahjongs_contours(img, img_name):
                 continue
         rect = cv2.minAreaRect(contours[i])
         box = cv2.boxPoints(rect)
-        valid_boxes.append(np.int64(box))
+        temp_boxes.append(np.int64(box))
+
+    valid_boxes = temp_boxes
 
     return valid_boxes
 
@@ -55,6 +60,10 @@ def extract_tiles(img, img_name):
         max_y = max(box[:, 0])
         min_y = min(box[:, 0])
         
+        print(max_x - min_x, max_y - min_y)
+
+        if max_x - min_x <= 35 and max_y - min_y <= 35:
+            continue
         tile_img = img[min_x+padding:max_x-padding, min_y+padding:max_y-padding].copy()
         tiles.append(tile_img)
     
@@ -89,5 +98,6 @@ def process_folder(input_folder, output_folder):
                 # 保存切割出的麻将牌图像
                 for i, tile in enumerate(tiles):
                     tile_path = os.path.join(subfolder_path, f'{i}.png')
+                    # 
                     cv2.imwrite(tile_path, tile)
                 print(f"处理完成: {file}, 生成 {len(tiles)} 张麻将牌。")
