@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import concurrent.futures
 
 def get_mahjongs_contours(img, img_name):
     """
@@ -10,10 +11,6 @@ def get_mahjongs_contours(img, img_name):
     """
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # cv2.imshow('gray', gray)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    
     thresh = np.zeros_like(gray)
     for i in range(19, 25, 2):
         thresh += cv2.inRange(img, (i * 10, i * 10, i * 10), (i * 10 + 20, i * 10 + 20, i * 10 + 20))
@@ -25,15 +22,12 @@ def get_mahjongs_contours(img, img_name):
         area = cv2.contourArea(contours[i])
         x, y, w, h = cv2.boundingRect(contours[i])
         aspect_ratio = max(w, h) / min(w, h)
-        # 长和宽均30
         if area < 250 or hierarchy[0][i][3] != -1 :
             continue
         if "Fourth_Mingpai" in img_name:
-            # 删除与右下角重叠的轮廓
             if x + w > 0.95 * img.shape[1] and y + h > 0.95 * img.shape[0]:
                 continue
         if "Second_Mingpai" in img_name:
-            # 删除与左上角重叠的轮廓
             if x < 0.05 * img.shape[1] and y < 0.05 * img.shape[0]:
                 continue
         rect = cv2.minAreaRect(contours[i])
@@ -59,8 +53,6 @@ def extract_tiles(img, img_name):
         min_x = min(box[:, 1])
         max_y = max(box[:, 0])
         min_y = min(box[:, 0])
-        
-        print(max_x - min_x, max_y - min_y)
 
         if max_x - min_x <= 35 and max_y - min_y <= 35:
             continue
@@ -69,35 +61,58 @@ def extract_tiles(img, img_name):
     
     return tiles
 
+def process_single_file(img_path, img_name, output_folder):
+    """
+    处理单个文件并保存结果（内部函数，用于多线程）
+    """
+    img = cv2.imread(img_path)
+    if img is None:
+        print(f"无法读取图像: {img_path}")
+        return
+    
+    tiles = extract_tiles(img, img_name)
+    
+    if tiles:
+        subfolder_name = os.path.splitext(img_name)[0]
+        subfolder_path = os.path.join(output_folder, subfolder_name)
+        os.makedirs(subfolder_path, exist_ok=True)
+        
+        for i, tile in enumerate(tiles):
+            tile_path = os.path.join(subfolder_path, f'{i}.png')
+            cv2.imwrite(tile_path, tile)
+        print(f"处理完成: {img_name}, 生成 {len(tiles)} 张麻将牌。")
+
 def process_folder(input_folder, output_folder):
     """
-    处理文件夹下所有图片（包含子文件夹），并将结果保存到输出文件夹。
+    多线程处理文件夹下所有图片（包含子文件夹），并将结果保存到输出文件夹
     """
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     
+    # 收集所有需要处理的文件路径
+    file_paths = []
     for root, _, files in os.walk(input_folder):
         for file in files:
             if file.lower().endswith(('png', 'jpg', 'jpeg')):
-                img_path = os.path.join(root, file)
-                img = cv2.imread(img_path)
-            
-                tiles = extract_tiles(img, file)
-                
-                # 创建对应的子文件
-                if tiles:
-                    subfolder_name = os.path.splitext(file)[0]
-                    subfolder_path = os.path.join(output_folder, subfolder_name)
-                    if not os.path.exists(subfolder_path):
-                        os.makedirs(subfolder_path)
-                
-                # 确认牌数不为0
-                if len(tiles) == 0:
-                    continue
-
-                # 保存切割出的麻将牌图像
-                for i, tile in enumerate(tiles):
-                    tile_path = os.path.join(subfolder_path, f'{i}.png')
-                    # 
-                    cv2.imwrite(tile_path, tile)
-                print(f"处理完成: {file}, 生成 {len(tiles)} 张麻将牌。")
+                full_path = os.path.join(root, file)
+                file_paths.append((full_path, file))
+    
+    # 使用线程池处理文件
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = []
+        for path, name in file_paths:
+            futures.append(
+                executor.submit(
+                    process_single_file,
+                    img_path=path,
+                    img_name=name,
+                    output_folder=output_folder
+                )
+            )
+        
+        # 等待所有任务完成并处理异常
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+            except Exception as e:
+                print(f"处理文件时发生错误: {str(e)}")

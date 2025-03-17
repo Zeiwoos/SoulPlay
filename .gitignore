@@ -6,6 +6,5 @@
 
 IMGProcess/__pycache__
 
-
-Data\recogition\output_first
-Data\recogition\output_final
+# 输出文件夹
+Data/recogition/output/* 

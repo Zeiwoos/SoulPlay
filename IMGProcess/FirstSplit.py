@@ -3,8 +3,7 @@ import numpy as np
 import paddleocr
 import os
 import logging
-from Draw import resize_for_display
-from Draw import draw_regions
+from IMGProcess.Draw import safe_rect
 # 屏蔽 PaddleOCR 的调试信息
 logging.getLogger("ppocr").setLevel(logging.ERROR)
 
@@ -27,7 +26,7 @@ def find_all_cards_in_region(img, regions):
     hand_regions = []
     
     for key, region in regions.items():
-        x1, y1, x2, y2 = region['rect']
+        x1, y1, x2, y2 = safe_rect(region['rect'], h_img, w_img)
         roi = img[y1:y2, x1:x2]
         
         # 转换为 HSV 颜色空间
@@ -73,8 +72,6 @@ def find_all_cards_in_region(img, regions):
                 
                 selected_contour = max(contours, key=cv2.contourArea, default=None) if contours else None
 
-
-            
             # 如果轮廓不为空，则获取轮廓的边界矩形
             if selected_contour is not None:
                 x, y, w, h = cv2.boundingRect(selected_contour)
@@ -83,14 +80,6 @@ def find_all_cards_in_region(img, regions):
 
     return hand_regions
 
-# 安全坐标转换函数
-def safe_rect(ratios, h, w):
-    x1 = max(0, int(w * ratios[0]))
-    y1 = max(0, int(h * ratios[1]))
-    x2 = min(w, int(w * ratios[2]))
-    y2 = min(h, int(h * ratios[3]))
-    return (x1, y1, x2, y2)
-
 # 保存切割的区域
 def save_cropped_regions(img, hand_regions, img_name, output_folder):
     """
@@ -98,6 +87,8 @@ def save_cropped_regions(img, hand_regions, img_name, output_folder):
     """
     img_base_name = os.path.splitext(img_name)[0]  # 去掉后缀
     img_output_path = os.path.join(output_folder, img_base_name)
+    format = img_name.split('.')[-1]
+    name = img_name.split('.')[0]
 
     # 确保输出文件夹存在
     os.makedirs(img_output_path, exist_ok=True)
@@ -107,8 +98,6 @@ def save_cropped_regions(img, hand_regions, img_name, output_folder):
     for key, x, y, w, h in hand_regions:
         cropped_img = img[max(0, y-20):min(h_img, y+h+20), max(0, x-20):min(w_img, x+w+20)]  # 裁剪区域
         # 获取格式和文件名
-        format = img_name.split('.')[-1]
-        name = img_name.split('.')[0]
         save_path = os.path.join(img_output_path, f"{name}_{key}.{format}")  # 保存路径
         cv2.imwrite(save_path, cropped_img)  # 保存图片
         print(f"已保存: {save_path}")

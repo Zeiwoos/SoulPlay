@@ -3,11 +3,14 @@ import time
 import os
 import threading
 from datetime import datetime
+import json
 
+with open("Data/json/profile.json", "r", encoding="utf-8") as f:
+    profile = json.load(f)
 class GameScreenCapturer:
     def __init__(self):
-        self.capture_interval = 1.0  # 默认截图间隔（秒）
-        self.output_dir = "screenshots"
+        self.capture_interval = profile['ScreenShotInterval']  # 默认截图间隔（秒）
+        self.output_dir = profile['PATH']['ScreenShotPath']
         self.running = False
         self.capture_thread = None
         self.region = None  # (left, top, width, height)
@@ -100,24 +103,3 @@ class GameScreenCapturer:
                       key=lambda x: os.path.getmtime(os.path.join(self.output_dir, x)),
                       reverse=True)
         return [os.path.join(self.output_dir, f) for f in files[:count]]
-    
-# 使用示例
-if __name__ == "__main__":
-    # 初始化配置
-    capturer = GameScreenCapturer()
-    
-    # 自定义配置（可选）
-    capturer.configure(
-        interval=0.5,  # 500ms截图间隔
-        output_dir="game_screenshots"
-    )
-    
-    # 启动服务
-    capturer.start()
-    
-    # 运行10秒后停止（实际使用时去掉这个部分）
-    time.sleep(10)
-    capturer.stop()
-    
-    # 获取最新3张截图
-    print("最新截图：", capturer.get_recent_screenshot(3))

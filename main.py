@@ -1,13 +1,55 @@
-from IMGProcess.FinalSplit import process_folder
-from IMGProcess.FirstSplit import save_cropped_regions, recognize_word, find_all_cards_in_region, safe_rect
-from IMGProcess.Draw import draw_regions, draw_original_regions
 import os
 import cv2
+import json
+import time
+import psutil
+import threading
+from GameRunStateTest import get_game_state
+from IMGProcess.Draw import draw_regions
+from IMGProcess.Draw import draw_original_regions
+from IMGProcess.Draw import safe_rect
+from IMGProcess.FinalSplit import process_folder
+from IMGProcess.FirstSplit import save_cropped_regions, recognize_word, find_all_cards_in_region
 from IMGProcess.ActorDetector import detect_actor
+from ScreenShot.GameShot import GameScreenCapturer
+from IMGProcess.StateGenerater import GameStateGenerator
 
-origin_img_folder = 'Data/recogition/IMG'
-first_processed_img_folder = 'Data/recogition/output_first/'
-second_processed_img_folder = 'Data/recogition/output_final/'
+global profile
+with open("Data/json/profile.json", "r", encoding="utf-8") as f:
+    profile = json.load(f)
+
+# 测试图片
+origin_img_folder = profile['PATH']['TestPath']
+# 截图路径
+ScreenShotPath = profile['PATH']['ScreenShotPath']
+# 截图间隔
+ScreenShotInterval = profile['ScreenShotInterval']
+# 第一次分割
+first_processed_img_folder = profile['PATH']['Split_FirstPath']
+# 第二次分割
+second_processed_img_folder = profile['PATH']['Split_FinalPath']
+# 游戏状态
+game_state_json_path = profile['PATH']['GameStatePath']
+# 手机区域
+regions_phone = profile['regions_phone']
+# PC区域
+regions_pc = profile['regions_pc']
+# 手机黄光区域
+Yellow_Light_Regions_phone = profile['Yellow_Light_Regions_phone']
+# PC黄光区域
+Yellow_Light_Regions_pc = profile['Yellow_Light_Regions_pc']
+
+# 检测路径是否存在
+def check_path(paths):
+    for key, path in paths.items():
+        if not os.path.exists(path):
+            print(f"Error: {path} does not exist")
+            # 创建路径
+            os.makedirs(path, exist_ok=True)
+        else:
+            print(f"Path {path} exists")
+    return True
+
 
 def processImg(img_folder, first_processed_img_folder, second_processed_img_folder):
     """
@@ -22,8 +64,7 @@ def processImg(img_folder, first_processed_img_folder, second_processed_img_fold
     for root, _, files in os.walk(img_folder):
         for file in files:
             if file.lower().endswith(('png', 'jpg', 'jpeg')):
-                print(f"------------ start Processing {file}------------")
-
+                print(f"-- -- -- -- -- --start Processing {file}-- -- -- -- --")
                 img_path = os.path.join(root, file)
                 img_name = os.path.basename(img_path)
                 img = cv2.imread(img_path)
@@ -31,64 +72,13 @@ def processImg(img_folder, first_processed_img_folder, second_processed_img_fold
                 # 获取图片的宽高
                 h, w = img.shape[:2]
 
-                # 定义区域
-                regions_phone = {
-                    # 手牌区域
-                    'Hand_Tiles': { 'rect': safe_rect((0.181, 0.82, 1, 1), h, w), 'color': (0, 0, 255) },# 蓝色
-                    # 明牌区域
-                    'Self_Mingpai': {'rect': safe_rect((0.181, 0.82, 1, 1), h, w), 'color': (0, 255, 255) },# 青色
-                    'Second_Mingpai': {'rect': safe_rect((0.72, 0.03, 0.85, 0.6), h, w), 'color': (255, 140, 0) },# 深橙色
-                    'Third_Mingpai': {'rect': safe_rect((0.255, 0, 0.60, 0.10), h, w), 'color': (255, 0, 255) },# 洋红色
-                    'Fourth_Mingpai': {'rect': safe_rect((0.12, 0.3, 0.252, 0.879), h, w), 'color': (128, 0, 128) },# 紫色
-                    # 弃牌区域
-                    'Self_Discard': {'rect': safe_rect((0.395, 0.497, 0.63, 0.70), h, w), 'color': (0, 255, 0) },# 绿色
-                    'Second_Discard': {'rect': safe_rect((0.57, 0.20, 0.73, 0.52), h, w), 'color': (0, 128, 255) },# 天蓝色
-                    'Third_Discard': {'rect': safe_rect((0.37, 0.115, 0.59, 0.27), h, w), 'color': (255, 0, 0) },# 红色
-                    'Fourth_Discard': {'rect': safe_rect((0.28, 0.24, 0.42, 0.58), h, w), 'color': (128, 128, 0) },# 橄榄绿
-                    # 宝牌指示牌
-                    'Dora_Indicator': {'rect': safe_rect((0.03, 0.02, 0.15, 0.12), h, w), 'color': (255, 255, 0) },# 黄色
-                    # 风位
-                    'Wind': {'rect': safe_rect((0.43, 0.453, 0.458, 0.498), h, w), 'color': (75, 0, 130) },# 靛蓝色
-                }
-
-                regions_pc = {
-                    'Hand_Tiles': { 'rect': safe_rect((0.11, 0.83, 1, 1.0), h, w), 'color': (0, 0, 255) },# 蓝色
-                    # 明牌区域
-                    'Self_Mingpai': {'rect': safe_rect((0.11, 0.83, 1, 1.0), h, w), 'color': (0, 255, 255) },# 青色
-                    'Second_Mingpai': {'rect': safe_rect((0.78, 0.03, 0.89, 0.6), h, w), 'color': (255, 140, 0) },# 深橙色
-                    'Third_Mingpai': {'rect': safe_rect((0.20, 0, 0.60, 0.11), h, w), 'color': (255, 0, 255) },# 洋红色
-                    'Fourth_Mingpai': {'rect': safe_rect((0.02, 0.22, 0.22, 0.883), h, w), 'color': (128, 0, 128) },# 紫色
-                    # 弃牌区域
-                    'Self_Discard': {'rect': safe_rect((0.39, 0.4975, 0.65, 0.70), h, w), 'color': (0, 255, 0) },# 绿色
-                    'Second_Discard': {'rect': safe_rect((0.595, 0.23, 0.75, 0.50), h, w), 'color': (0, 128, 255) },# 天蓝色
-                    'Third_Discard': {'rect': safe_rect((0.37, 0.11, 0.61, 0.265), h, w), 'color': (255, 0, 0) },# 红色
-                    'Fourth_Discard': {'rect': safe_rect((0.22, 0.23, 0.4095, 0.59), h, w), 'color': (128, 128, 0) },# 橄榄绿
-                    # 宝牌指示牌
-                    'Dora_Indicator': {'rect': safe_rect((0.0, 0.02, 0.17, 0.12), h, w), 'color': (255, 255, 0) },# 黄色
-                    # 风位
-                    'Wind': {'rect': safe_rect((0.41, 0.455, 0.46, 0.498), h, w), 'color': (75, 0, 130) },# 靛蓝色
-                }
-
-                Yellow_Light_Regions_phone = {
-                    'Self_Yellow_Light': {'rect': safe_rect((0.47, 0.43, 0.54, 0.48), h, w), 'color': (0, 255, 255) },# 黄色
-                    'Second_Yellow_Light': {'rect': safe_rect((0.525, 0.35, 0.555, 0.44), h, w), 'color': (0, 255, 255) },# 黄色
-                    'Third_Yellow_Light': {'rect': safe_rect((0.47, 0.31, 0.53, 0.35), h, w), 'color': (0, 255, 255) },# 黄色
-                    'Fourth_Yellow_Light': {'rect': safe_rect((0.446, 0.35, 0.475, 0.44), h, w), 'color': (0, 255, 255) },# 黄色
-                }
-                Yellow_Light_Regions_pc = {
-                    'Self_Yellow_Light': {'rect': safe_rect((0.47, 0.43, 0.54, 0.48), h, w), 'color': (0, 255, 255) },# 黄色
-                    'Second_Yellow_Light': {'rect': safe_rect((0.532, 0.35, 0.572, 0.44), h, w), 'color': (0, 255, 255) },# 黄色
-                    'Third_Yellow_Light': {'rect': safe_rect((0.47, 0.31, 0.53, 0.35), h, w), 'color': (0, 255, 255) },# 黄色
-                    'Fourth_Yellow_Light': {'rect': safe_rect((0.43, 0.35, 0.47, 0.44), h, w), 'color': (0, 255, 255) },# 黄色
-                }
                 # 长宽比
-                IsPhone = False
-                if max(w, h)/min(w, h) > 2:
-                    IsPhone = True
+                IsPhone = True if max(w, h)/min(w, h) > 2 else False
                 regions = regions_phone if IsPhone else regions_pc
 
                 # 识别风牌
-                text_wind = recognize_word(img[regions['Wind']['rect'][1]:regions['Wind']['rect'][3], regions['Wind']['rect'][0]:regions['Wind']['rect'][2]])
+                rect = safe_rect(regions['Wind']['rect'], h, w)
+                text_wind = recognize_word(img[rect[1]:rect[3], rect[0]:rect[2]])
                 print(text_wind)
 
                 IsActor, Yellow_Light_Regions = detect_actor(img, Yellow_Light_Regions_phone if IsPhone else Yellow_Light_Regions_pc)
@@ -100,13 +90,74 @@ def processImg(img_folder, first_processed_img_folder, second_processed_img_fold
                 draw_regions(img, hand_regions, regions)
                 draw_original_regions(img, regions)
                 # 使用save_cropped_regions函数进行处理
-                img_output_path = save_cropped_regions(img, hand_regions, img_name, f"{first_processed_img_folder}{'Phone' if IsPhone else 'PC'}{'/'}")
+                img_output_path = save_cropped_regions(img, hand_regions, img_name, f"{first_processed_img_folder}{'/'}")
 
                 # 使用process_folder函数进行处理
-                process_folder(img_output_path, f"{second_processed_img_folder}{'Phone' if IsPhone else 'PC'}{'/'}")
+                process_folder(img_output_path, f"{second_processed_img_folder}{'/'}")
 
-                print(f"------------Processing {file} done------------")
+                print(f"-- -- -- -- -- --Processing {file} done-- -- -- -- --\n")
+
+def main():
+    # 检查路径
+    check_path(profile['PATH'])
+    check_path(profile['Templates'])
+    processImg(ScreenShotPath, first_processed_img_folder, second_processed_img_folder) 
+
+    # 生成游戏状态
+    generator = GameStateGenerator()
+        
+    # 生成并保存游戏状态
+    generator.save_game_state(
+    output_path=game_state_json_path
+    )
 
 
-if __name__ == '__main__':
-    processImg(origin_img_folder, first_processed_img_folder, second_processed_img_folder)
+def is_game_running(game_name, capturer):
+    """检查游戏进程是否在运行，并控制截图"""
+    global profile
+    game_was_running = False  # 记录上一次游戏是否运行
+    while True:
+        running = False
+        for process in psutil.process_iter(attrs=["pid", "name"]):
+            if game_name.lower() in process.info["name"].lower():
+                running = True
+                break
+
+        profile["is_game_running"] = running
+
+        # **游戏状态变化时，启动或停止截图**
+        if running and not game_was_running:
+            print(f"🔵 游戏 {game_name} 运行中，开始截图...")
+            capturer.start()
+        elif not running and game_was_running:
+            print(f"🔴 游戏 {game_name} 已关闭，停止截图...")
+            capturer.stop()
+
+        game_was_running = running  # 更新状态
+        time.sleep(5)  # **每 5 秒检测一次**
+
+
+
+
+# 使用示例
+if __name__ == "__main__":
+    main()
+
+# if __name__ == '__main__':
+#     # 初始化配置
+#     capturer = GameScreenCapturer()
+    
+#     # 自定义配置
+#     capturer.configure(
+#         interval=ScreenShotInterval,  # 500ms截图间隔
+#         output_dir=profile['ScreenShot']['ScreenShotPath']
+#     )
+#     # 启动游戏检测线程
+#     game_monitor_thread = threading.Thread(target=is_game_running(profile["game_name"], capturer), daemon=True)
+#     game_monitor_thread.start()
+#     # 主线程保持运行，防止进程退出
+#     try:
+#         while True:
+#             time.sleep(1)
+#     except KeyboardInterrupt:
+#         print("🔴 退出程序...")

@@ -1,6 +1,13 @@
 import cv2
 import numpy as np
-import uuid
+import json
+
+with open("Data/json/profile.json", "r", encoding="utf-8") as f:
+    profile = json.load(f)
+
+first_processed_img_folder = profile['Split_First']['Split_FirstPath']
+second_processed_img_folder = profile['Split_Final']['Split_FinalPath']
+
 
 def get_mahjongs_contours(img):
     """
@@ -62,7 +69,7 @@ def extract_tiles(img):
 
 if __name__ == '__main__':
     # 改为对文件夹操作
-    img = cv2.imread('Data\\recogition\output_first\PC\pc3\pc3_Fourth_Mingpai.png')  # 请替换为实际图片路径
+    img = cv2.imread(first_processed_img_folder + 'PC/pc3/pc3_Fourth_Mingpai.png')  # 请替换为实际图片路径
     tiles, img_with_boxes = extract_tiles(img)
     print(len(tiles))
     
@@ -74,6 +81,6 @@ if __name__ == '__main__':
     print(f"麻将牌分割完成，共 {len(tiles)} 张麻将牌。")
     # 保存切割出的麻将牌图像
     for i, tile in enumerate(tiles):
-        tile_path = f'Data/recogition/output_final/{i}.png'
+        tile_path = second_processed_img_folder + f'{i}.png'
         cv2.imwrite(tile_path, tile)
     print(f"麻将牌分割完成，共 {len(tiles)} 张麻将牌。")

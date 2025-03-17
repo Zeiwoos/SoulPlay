@@ -1,22 +1,19 @@
 import cv2
 import numpy as np
-from FirstSplit import safe_rect
-from Draw import draw_original_regions
-from Draw import draw_regions
-from Draw import resize_for_display
-import paddleocr
-from FirstSplit import recognize_word
+from IMGProcess.Draw import safe_rect
 
 def detect_actor(img, regions):
     Yellow_Light_Regions = []
+    h_img, w_img = img.shape[:2]
+    # cv2.imshow('img', img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     # 四人数组
     IsActor = [False, False, False, False]
     for key, region in regions.items():
-        x1, y1, x2, y2 = region['rect']
+        x1, y1, x2, y2 = safe_rect(region["rect"], h_img, w_img)
         roi = img[y1:y2, x1:x2]
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-
-        import numpy as np
 
         # 暗黄到明黄的HSV范围
         lower_bound = np.array([0, 0, 0])  # 暗黄色
