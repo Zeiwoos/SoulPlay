@@ -5,3 +5,7 @@
 *.xml
 
 IMGProcess/__pycache__
+
+
+Data\recogition\output_first
+Data\recogition\output_final
