@@ -4,15 +4,15 @@ import json
 import time
 import psutil
 import threading
-from GameRunStateTest import get_game_state
+from GameStatusDetect.GameRunStateTest import get_game_state
 from IMGProcess.Draw import draw_regions
 from IMGProcess.Draw import draw_original_regions
 from IMGProcess.Draw import safe_rect
 from IMGProcess.FinalSplit import process_folder
 from IMGProcess.FirstSplit import save_cropped_regions, recognize_word, find_all_cards_in_region
 from IMGProcess.ActorDetector import detect_actor
-from ScreenShot.GameShot import GameScreenCapturer
-from IMGProcess.StateGenerater import GameStateGenerator
+from ScreenShotController.GameShot import GameScreenCapturer
+from IMGProcess.TileStateGenerater import GameStateGenerator
 
 global profile
 with open("Data/json/profile.json", "r", encoding="utf-8") as f:
