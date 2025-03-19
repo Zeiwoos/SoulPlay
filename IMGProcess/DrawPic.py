@@ -30,7 +30,11 @@ def draw_original_regions(img, regions):
     for key, region in regions.items():
         x1, y1, x2, y2 = safe_rect(region['rect'], h_img, w_img)
         cv2.rectangle(temp_img, (x1, y1), (x2, y2), region['color'], 2)
-    temp_img = resize_for_display(temp_img)
+    # temp_img = resize_for_display(temp_img)
+    # cv2.imshow('temp_img', temp_img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
 
 # 缩放图片适应屏幕
 def resize_for_display(image, max_width=1000, max_height=800):

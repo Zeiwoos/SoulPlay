@@ -3,7 +3,7 @@ import numpy as np
 import paddleocr
 import os
 import logging
-from IMGProcess.Draw import safe_rect
+from IMGProcess.DrawPic import safe_rect
 # 屏蔽 PaddleOCR 的调试信息
 logging.getLogger("ppocr").setLevel(logging.ERROR)
 
@@ -77,7 +77,7 @@ def find_all_cards_in_region(img, regions):
                 x, y, w, h = cv2.boundingRect(selected_contour)
                 if w > 25 and h > 25:
                     hand_regions.append((key, x + x1, y + y1, w, h))
-
+    print(hand_regions)
     return hand_regions
 
 # 保存切割的区域
@@ -99,32 +99,8 @@ def save_cropped_regions(img, hand_regions, img_name, output_folder):
         cropped_img = img[max(0, y-20):min(h_img, y+h+20), max(0, x-20):min(w_img, x+w+20)]  # 裁剪区域
         # 获取格式和文件名
         save_path = os.path.join(img_output_path, f"{name}_{key}.{format}")  # 保存路径
+
         cv2.imwrite(save_path, cropped_img)  # 保存图片
         print(f"已保存: {save_path}")
 
     return img_output_path
-
-# if __name__ == '__main__':
-#     img = cv2.imread('Data\\recogition\IMG\PC\pc3.png')
-#     h, w = img.shape[:2]
-#     regions_pc = {
-#                     'Hand_Tiles': { 'rect': safe_rect((0.11, 0.83, 1, 1.0), h, w), 'color': (0, 0, 255) },# 蓝色
-#                     # 明牌区域
-#                     'Self_Mingpai': {'rect': safe_rect((0.11, 0.83, 1, 1.0), h, w), 'color': (0, 255, 255) },# 青色
-#                     'Second_Mingpai': {'rect': safe_rect((0.78, 0.03, 0.89, 0.6), h, w), 'color': (255, 140, 0) },# 深橙色
-#                     'Third_Mingpai': {'rect': safe_rect((0.20, 0, 0.60, 0.11), h, w), 'color': (255, 0, 255) },# 洋红色
-#                     'Fourth_Mingpai': {'rect': safe_rect((0.02, 0.22, 0.22, 0.883), h, w), 'color': (128, 0, 128) },# 紫色
-#                     # 弃牌区域
-#                     'Self_Discard': {'rect': safe_rect((0.39, 0.4975, 0.65, 0.70), h, w), 'color': (0, 255, 0) },# 绿色
-#                     'Second_Discard': {'rect': safe_rect((0.595, 0.23, 0.75, 0.50), h, w), 'color': (0, 128, 255) },# 天蓝色
-#                     'Third_Discard': {'rect': safe_rect((0.37, 0.11, 0.61, 0.265), h, w), 'color': (255, 0, 0) },# 红色
-#                     'Fourth_Discard': {'rect': safe_rect((0.22, 0.23, 0.4095, 0.59), h, w), 'color': (128, 128, 0) },# 橄榄绿
-#                     # 宝牌指示牌
-#                     'Dora_Indicator': {'rect': safe_rect((0.0, 0.02, 0.17, 0.12), h, w), 'color': (255, 255, 0) },# 黄色
-#                     # 风位
-#                     'Wind': {'rect': safe_rect((0.41, 0.455, 0.46, 0.498), h, w), 'color': (75, 0, 130) },# 靛蓝色
-#                 }
-#     hand_regions = find_all_cards_in_region(img, regions_pc)
-#     print(hand_regions)
-#     draw_regions(img, hand_regions, regions_pc)
-

@@ -13,24 +13,47 @@ import json
 with open("Data/json/profile.json", "r", encoding="utf-8") as f:
     profile = json.load(f)
 
-def find_subfolders_with_suffix_scandir(parent_folder):
+def find_subfolders_with_suffix_scandir(parent_folder, filename):
     """使用 os.scandir() 查找一级子文件夹，性能更优"""
     suffix = profile['Suffix']['Suffix']
     folder_list = {}
+
     for suffix in suffix:
         # 返回 suffix , 文件名的dict
         for entry in os.scandir(parent_folder):
-            if entry.is_dir() and entry.name.endswith(suffix):
+            if entry.is_dir() and entry.name == f"{filename}_{suffix}":
                 folder_list[suffix] = entry.name
     return folder_list
 
+# 删除SceenShotPath、Split_FinalPath、Split_FirstPath下所有文件
+def delete_folders():
+    Path_list = ["ScreenShotPath", "Split_FinalPath", "Split_FirstPath"]
+    # Path_list = ["Split_FinalPath", "Split_FirstPath"]
+    for folder in Path_list:
+        target_dir = profile['PATH'][folder]
+        
+        # 确保路径存在
+        if not os.path.exists(target_dir):
+            continue
+                
+        # 遍历目录内容
+        for entry in os.listdir(target_dir):
+            full_path = os.path.join(target_dir, entry)
+                
+            try:
+                if os.path.isfile(full_path) or os.path.islink(full_path):
+                    os.remove(full_path)  # 删除文件或符号链接
+                elif os.path.isdir(full_path):
+                    shutil.rmtree(full_path)  # 递归删除目录
+            except Exception as e:
+                print(f"删除 {full_path} 失败，错误：{e}")
 class GameStateGenerator(BatchClassifier):
     """
     游戏状态生成器
     """
-    def __init__(self):
+    def __init__(self,filename):
         super().__init__()
-        self.folder_list = find_subfolders_with_suffix_scandir(profile['PATH']['Split_FinalPath'])
+        self.folder_list = find_subfolders_with_suffix_scandir(profile['PATH']['Split_FinalPath'], filename)
 
     def process_tiles(self) -> List[str]:
         """多线程处理麻将图片"""
@@ -125,30 +148,6 @@ class GameStateGenerator(BatchClassifier):
             "tiles": self.process_tiles(),
             "doras": self.recognize_dora()  # 使用真实宝牌
         }
-    
-    # 删除SceenShotPath、Split_FinalPath、Split_FirstPath下所有文件
-    def delete_folders(self):
-        # Path_list = ["ScreenShotPath", "Split_FinalPath", "Split_FirstPath"]
-        Path_list = ["Split_FinalPath", "Split_FirstPath"]
-        for folder in Path_list:
-            target_dir = profile['PATH'][folder]
-            
-            # 确保路径存在
-            if not os.path.exists(target_dir):
-                continue
-                
-            # 遍历目录内容
-            for entry in os.listdir(target_dir):
-                full_path = os.path.join(target_dir, entry)
-                
-                try:
-                    if os.path.isfile(full_path) or os.path.islink(full_path):
-                        os.remove(full_path)  # 删除文件或符号链接
-                    elif os.path.isdir(full_path):
-                        shutil.rmtree(full_path)  # 递归删除目录
-                except Exception as e:
-                    print(f"删除 {full_path} 失败，错误：{e}")
-
 
     def save_game_state(self, output_path: str):
         """保存游戏状态到JSON文件"""
@@ -158,5 +157,3 @@ class GameStateGenerator(BatchClassifier):
             json.dump(game_state, f, indent=2, ensure_ascii=False)
             
         print(f"游戏状态已保存至：{os.path.abspath(output_path)}")
-        self.delete_folders()
-        print("图片删除完成")

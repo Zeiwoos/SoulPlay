@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from IMGProcess.Draw import safe_rect
+from IMGProcess.DrawPic import safe_rect
 
 def detect_actor(img, regions):
     Yellow_Light_Regions = []

@@ -2,10 +2,10 @@ import cv2
 import json
 import os
 
-with open("Data/json/profile.json", "r") as f:
+with open("Data/json/profile.json", "r", encoding="utf-8") as f:  # 明确指定 UTF-8 编码
     profile = json.load(f)
 
-best_match_state = profile["best_match_state"]
+best_match_state = profile["BestMatchState"]
 
 def load_templates(template_folder):
     """ 加载指定文件夹内的所有模板 """
@@ -25,21 +25,23 @@ def match_game_state(state, screen, templates, threshold=0.6):
     :param threshold: 匹配阈值
     :return: 是否匹配上
     """
+
     best_score = 0
     for template in templates:
-        result = cv2.matchTemplate(screen, template, cv2.TM_CCOEFF_NORMED)
+        img = cv2.imread(screen, 0)
+        result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         best_score = max(best_score, max_val)
     # 将最佳匹配度写入profile.json
-    with open("Data/json/profile.json", "w") as f:
-        profile["best_match_state"][state] = best_score
+    with open("Data/json/profile.json", "w", encoding="utf-8") as f:
+        profile["BestMatchState"][state] = best_score
         json.dump(profile, f)
     return best_score
 
 def get_game_state(screen):
     # 加载所有模板
     game_states = {}
-    for state, folder in profile["templates"].items():
+    for state, folder in profile["Templates"].items():
         game_states[state] = load_templates(folder)
 
     # 遍历所有游戏状态，检测当前游戏状态
@@ -50,6 +52,8 @@ def get_game_state(screen):
     # 获取最佳匹配状态
     game_state = max(best_match_state, key=best_match_state.get)
     print(best_match_state)
+    if best_match_state["result_screen"] > 0.9:
+        game_state = "result_screen"
 
     print(f"最佳匹配状态: {game_state}")
 
