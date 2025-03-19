@@ -1,1 +1,443 @@
-{"PATH": {"TestPath": "Data/recogition/IMG/", "ScreenShotPath": "Data/recogition/output/screenshots", "GameStatePath": "Data/json/game-state/game_state.json", "OutputPath": "Data/recogition/output/", "ModelPath": "ModelTrain/recogition/tile.model", "Split_FirstPath": "Data/recogition/output/split_first/", "Split_FinalPath": "Data/recogition/output/split_final/"}, "Templates": {"main_menu": "Data/templates/main_menu/", "matching": "Data/templates/matching/", "in_game": "Data/templates/in_game/", "result_screen": "Data/templates/result_screen/"}, "ScreenShotInterval": 1, "Suffix": {"Suffix": ["Hand_Tiles", "Self_Mingpai", "Second_Mingpai", "Third_Mingpai", "Fourth_Mingpai", "Self_Discard", "Second_Discard", "Third_Discard", "Fourth_Discard", "Dora_Indicator", "Wind"]}, "regions_phone": {"Hand_Tiles": {"rect": [0.181, 0.82, 1, 1], "color": [0, 0, 255]}, "Self_Mingpai": {"rect": [0.181, 0.82, 1, 1], "color": [0, 255, 255]}, "Second_Mingpai": {"rect": [0.72, 0.03, 0.85, 0.6], "color": [255, 140, 0]}, "Third_Mingpai": {"rect": [0.255, 0, 0.6, 0.1], "color": [255, 0, 255]}, "Fourth_Mingpai": {"rect": [0.12, 0.3, 0.252, 0.879], "color": [128, 0, 128]}, "Self_Discard": {"rect": [0.395, 0.497, 0.63, 0.7], "color": [0, 255, 0]}, "Second_Discard": {"rect": [0.57, 0.2, 0.73, 0.52], "color": [0, 128, 255]}, "Third_Discard": {"rect": [0.37, 0.115, 0.59, 0.27], "color": [255, 0, 0]}, "Fourth_Discard": {"rect": [0.28, 0.24, 0.42, 0.58], "color": [128, 128, 0]}, "Dora_Indicator": {"rect": [0.03, 0.02, 0.15, 0.12], "color": [255, 255, 0]}, "Wind": {"rect": [0.43, 0.453, 0.458, 0.498], "color": [75, 0, 130]}}, "regions_pc": {"Hand_Tiles": {"rect": [0.11, 0.83, 1, 1.0], "color": [0, 0, 255]}, "Self_Mingpai": {"rect": [0.11, 0.83, 1, 1.0], "color": [0, 255, 255]}, "Second_Mingpai": {"rect": [0.78, 0.03, 0.89, 0.6], "color": [255, 140, 0]}, "Third_Mingpai": {"rect": [0.2, 0, 0.6, 0.11], "color": [255, 0, 255]}, "Fourth_Mingpai": {"rect": [0.02, 0.22, 0.22, 0.883], "color": [128, 0, 128]}, "Self_Discard": {"rect": [0.39, 0.4975, 0.65, 0.7], "color": [0, 255, 0]}, "Second_Discard": {"rect": [0.595, 0.23, 0.75, 0.5], "color": [0, 128, 255]}, "Third_Discard": {"rect": [0.37, 0.11, 0.61, 0.265], "color": [255, 0, 0]}, "Fourth_Discard": {"rect": [0.22, 0.23, 0.4095, 0.59], "color": [128, 128, 0]}, "Dora_Indicator": {"rect": [0.0, 0.02, 0.17, 0.12], "color": [255, 255, 0]}, "Wind": {"rect": [0.41, 0.455, 0.46, 0.498], "color": [75, 0, 130]}}, "Yellow_Light_Regions_phone": {"Self_Yellow_Light": {"rect": [0.47, 0.43, 0.54, 0.48], "color": [0, 255, 255]}, "Second_Yellow_Light": {"rect": [0.525, 0.35, 0.555, 0.44], "color": [0, 255, 255]}, "Third_Yellow_Light": {"rect": [0.47, 0.31, 0.53, 0.35], "color": [0, 255, 255]}, "Fourth_Yellow_Light": {"rect": [0.446, 0.35, 0.475, 0.44], "color": [0, 255, 255]}}, "Yellow_Light_Regions_pc": {"Self_Yellow_Light": {"rect": [0.47, 0.43, 0.54, 0.48], "color": [0, 255, 255]}, "Second_Yellow_Light": {"rect": [0.532, 0.35, 0.572, 0.44], "color": [0, 255, 255]}, "Third_Yellow_Light": {"rect": [0.47, 0.31, 0.53, 0.35], "color": [0, 255, 255]}, "Fourth_Yellow_Light": {"rect": [0.43, 0.35, 0.47, 0.44], "color": [0, 255, 255]}}, "BestMatchState": {"main_menu": 0.43326398730278015, "matching": 0.47934868931770325, "in_game": 0.9910850524902344, "result_screen": 0.9903993606567383}, "is_game_running": false, "game_name": "MahjongSoul", "GameWindowTitle_CN": "\u96c0\u9b42", "GameWindowTitle_EN": "MahjongSoul", "Retry_Count": 10, "Retry_Interval": 2}
+{
+  "PATH": {
+    "TestPath": "Data/recogition/IMG/",
+    "ScreenShotPath": "Data/recogition/output/screenshots",
+    "GameStatePath": "Data/json/game-state/game_state.json",
+    "OutputPath": "Data/recogition/output/",
+    "ModelPath": "ModelTrain/recogition/tile.model",
+    "Split_FirstPath": "Data/recogition/output/split_first/",
+    "Split_FinalPath": "Data/recogition/output/split_final/"
+  },
+  "Templates": {
+    "main_menu": "Data/templates/main_menu/",
+    "matching": "Data/templates/matching/",
+    "in_game": "Data/templates/in_game/",
+    "result_screen": "Data/templates/result_screen/"
+  },
+  "ScreenShotInterval": 2,
+  "Suffix": {
+    "Suffix": [
+      "Hand_Tiles",
+      "Self_Mingpai",
+      "Second_Mingpai",
+      "Third_Mingpai",
+      "Fourth_Mingpai",
+      "Self_Discard",
+      "Second_Discard",
+      "Third_Discard",
+      "Fourth_Discard",
+      "Dora_Indicator",
+      "Wind"
+    ]
+  },
+  "regions_phone": {
+    "Hand_Tiles": {
+      "rect": [
+        0.181,
+        0.82,
+        1,
+        1
+      ],
+      "color": [
+        0,
+        0,
+        255
+      ]
+    },
+    "Self_Mingpai": {
+      "rect": [
+        0.181,
+        0.82,
+        1,
+        1
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Second_Mingpai": {
+      "rect": [
+        0.72,
+        0.03,
+        0.85,
+        0.6
+      ],
+      "color": [
+        255,
+        140,
+        0
+      ]
+    },
+    "Third_Mingpai": {
+      "rect": [
+        0.255,
+        0,
+        0.6,
+        0.1
+      ],
+      "color": [
+        255,
+        0,
+        255
+      ]
+    },
+    "Fourth_Mingpai": {
+      "rect": [
+        0.12,
+        0.3,
+        0.252,
+        0.879
+      ],
+      "color": [
+        128,
+        0,
+        128
+      ]
+    },
+    "Self_Discard": {
+      "rect": [
+        0.395,
+        0.497,
+        0.63,
+        0.7
+      ],
+      "color": [
+        0,
+        255,
+        0
+      ]
+    },
+    "Second_Discard": {
+      "rect": [
+        0.57,
+        0.2,
+        0.73,
+        0.52
+      ],
+      "color": [
+        0,
+        128,
+        255
+      ]
+    },
+    "Third_Discard": {
+      "rect": [
+        0.37,
+        0.115,
+        0.59,
+        0.27
+      ],
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "Fourth_Discard": {
+      "rect": [
+        0.28,
+        0.24,
+        0.42,
+        0.58
+      ],
+      "color": [
+        128,
+        128,
+        0
+      ]
+    },
+    "Dora_Indicator": {
+      "rect": [
+        0.03,
+        0.02,
+        0.15,
+        0.12
+      ],
+      "color": [
+        255,
+        255,
+        0
+      ]
+    },
+    "Wind": {
+      "rect": [
+        0.43,
+        0.453,
+        0.458,
+        0.498
+      ],
+      "color": [
+        75,
+        0,
+        130
+      ]
+    }
+  },
+  "regions_pc": {
+    "Hand_Tiles": {
+      "rect": [
+        0.11,
+        0.83,
+        1,
+        1.0
+      ],
+      "color": [
+        0,
+        0,
+        255
+      ]
+    },
+    "Self_Mingpai": {
+      "rect": [
+        0.11,
+        0.83,
+        1,
+        1.0
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Second_Mingpai": {
+      "rect": [
+        0.78,
+        0.03,
+        0.89,
+        0.6
+      ],
+      "color": [
+        255,
+        140,
+        0
+      ]
+    },
+    "Third_Mingpai": {
+      "rect": [
+        0.2,
+        0,
+        0.6,
+        0.11
+      ],
+      "color": [
+        255,
+        0,
+        255
+      ]
+    },
+    "Fourth_Mingpai": {
+      "rect": [
+        0.02,
+        0.22,
+        0.22,
+        0.883
+      ],
+      "color": [
+        128,
+        0,
+        128
+      ]
+    },
+    "Self_Discard": {
+      "rect": [
+        0.39,
+        0.4975,
+        0.65,
+        0.7
+      ],
+      "color": [
+        0,
+        255,
+        0
+      ]
+    },
+    "Second_Discard": {
+      "rect": [
+        0.595,
+        0.23,
+        0.75,
+        0.5
+      ],
+      "color": [
+        0,
+        128,
+        255
+      ]
+    },
+    "Third_Discard": {
+      "rect": [
+        0.37,
+        0.11,
+        0.61,
+        0.265
+      ],
+      "color": [
+        255,
+        0,
+        0
+      ]
+    },
+    "Fourth_Discard": {
+      "rect": [
+        0.22,
+        0.23,
+        0.4095,
+        0.59
+      ],
+      "color": [
+        128,
+        128,
+        0
+      ]
+    },
+    "Dora_Indicator": {
+      "rect": [
+        0.0,
+        0.02,
+        0.17,
+        0.12
+      ],
+      "color": [
+        255,
+        255,
+        0
+      ]
+    },
+    "Wind": {
+      "rect": [
+        0.41,
+        0.455,
+        0.46,
+        0.498
+      ],
+      "color": [
+        75,
+        0,
+        130
+      ]
+    }
+  },
+  "Yellow_Light_Regions_phone": {
+    "Self_Yellow_Light": {
+      "rect": [
+        0.47,
+        0.43,
+        0.54,
+        0.48
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Second_Yellow_Light": {
+      "rect": [
+        0.525,
+        0.35,
+        0.555,
+        0.44
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Third_Yellow_Light": {
+      "rect": [
+        0.47,
+        0.31,
+        0.53,
+        0.35
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Fourth_Yellow_Light": {
+      "rect": [
+        0.446,
+        0.35,
+        0.475,
+        0.44
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    }
+  },
+  "Yellow_Light_Regions_pc": {
+    "Self_Yellow_Light": {
+      "rect": [
+        0.47,
+        0.43,
+        0.54,
+        0.48
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Second_Yellow_Light": {
+      "rect": [
+        0.532,
+        0.35,
+        0.572,
+        0.44
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Third_Yellow_Light": {
+      "rect": [
+        0.47,
+        0.31,
+        0.53,
+        0.35
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    },
+    "Fourth_Yellow_Light": {
+      "rect": [
+        0.43,
+        0.35,
+        0.47,
+        0.44
+      ],
+      "color": [
+        0,
+        255,
+        255
+      ]
+    }
+  },
+  "BestMatchState": {
+    "main_menu": 0.5779480338096619,
+    "matching": 0.3179961144924164,
+    "in_game": 0.3987753391265869,
+    "result_screen": 0.485357403755188
+  },
+  "is_game_running": false,
+  "game_name": "MahjongSoul",
+  "GameWindowTitle_CN": "雀魂",
+  "GameWindowTitle_EN": "MahjongSoul",
+  "Retry_Count": 5,
+  "Retry_Interval": 2
+}

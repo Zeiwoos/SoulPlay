@@ -12,12 +12,12 @@ def safe_rect(ratios, h, w):
 def draw_regions(img, hand_regions, regions):
     h_img, w_img = img.shape[:2]
     temp_img = img.copy()
-    for (key, x, y, w, h) in hand_regions:
-        if key in regions:  # 确保 key 存在于 regions
+    for key, region in hand_regions.items():
+        x1, y1, x2, y2 = safe_rect(region, h_img, w_img)
+        if key in regions:
             color = regions[key]['color']
         else:
-            color = (255, 255, 255)  # 如果找不到，默认白色
-        x1, y1, x2, y2 = safe_rect((x, y, x + w, y + h), h_img, w_img)
+            color = (255, 255, 255)
         cv2.rectangle(temp_img, (x1, y1), (x2, y2), color, 2)
     temp_img = resize_for_display(temp_img)
     # cv2.imshow('temp_img', temp_img)
@@ -35,15 +35,12 @@ def draw_original_regions(img, regions):
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
 
-
-# 缩放图片适应屏幕
 def resize_for_display(image, max_width=1000, max_height=800):
     h, w = image.shape[:2]
     scale = min(max_width / w, max_height / h)  # 计算缩放比例
     if scale < 1:  # 仅当图片过大时缩小
         image = cv2.resize(image, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
     return image
-
 
 
     

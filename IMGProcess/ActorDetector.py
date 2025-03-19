@@ -3,48 +3,38 @@ import numpy as np
 from IMGProcess.DrawPic import safe_rect
 
 def detect_actor(img, regions):
-    Yellow_Light_Regions = []
+    """
+    检测黄色高亮区域，判断是否为行动者
+    """
     h_img, w_img = img.shape[:2]
-    # cv2.imshow('img', img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    # 四人数组
+    
+    Yellow_Light_Regions = {}
     IsActor = [False, False, False, False]
-    for key, region in regions.items():
+
+    # 预计算 HSV 颜色范围
+    lower_bound = np.array([0, 0, 0], dtype=np.uint8)
+    upper_bound = np.array([60, 255, 255], dtype=np.uint8)
+    kernel = np.ones((11, 11), np.uint8)
+
+    # 直接遍历 regions，提高访问效率
+    for idx, (key, region) in enumerate(regions.items()):
         x1, y1, x2, y2 = safe_rect(region["rect"], h_img, w_img)
-        roi = img[y1:y2, x1:x2]
-        hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(img[y1:y2, x1:x2], cv2.COLOR_BGR2HSV)
 
-        # 暗黄到明黄的HSV范围
-        lower_bound = np.array([0, 0, 0])  # 暗黄色
-        upper_bound = np.array([60, 255, 255])  # 明黄色
-
+        # 计算黄色遮罩
         mask = cv2.inRange(hsv, lower_bound, upper_bound)
-
-        # 腐蚀再恢复
-        kernel = np.ones((11, 11), np.uint8)
-        mask = cv2.erode(mask, kernel, iterations=1)
-        mask = cv2.dilate(mask, kernel, iterations=1)
-
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel) 
+        
+        # 轮廓检测
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-        for contour in contours:
+        if contours:
+            # 直接选取最大轮廓，避免循环
+            contour = max(contours, key=cv2.contourArea)
             x, y, w, h = cv2.boundingRect(contour)
+
             if w > 70 or h > 20:
-                Yellow_Light_Regions.append((key, x + x1, y + y1, w, h))
-                if key == 'Self_Yellow_Light':
-                    IsActor[0] = True
-                elif key == 'Second_Yellow_Light':
-                    IsActor[1] = True
-                elif key == 'Third_Yellow_Light':
-                    IsActor[2] = True
-                elif key == 'Fourth_Yellow_Light':
-                    IsActor[3] = True
+                Yellow_Light_Regions[key] = (x1 + x, y1 + y, w, h)
+                IsActor[idx] = True  
 
     return IsActor, Yellow_Light_Regions
-
-
-    
-
-
-

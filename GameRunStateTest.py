@@ -1,61 +1,93 @@
 import cv2
 import json
 import os
+import threading
+from concurrent.futures import ThreadPoolExecutor
+import numpy as np
+from functools import lru_cache
 
-with open("Data/json/profile.json", "r", encoding="utf-8") as f:  # 明确指定 UTF-8 编码
+# 预处理配置
+with open("Data/json/profile.json", "r", encoding="utf-8") as f:
     profile = json.load(f)
 
-best_match_state = profile["BestMatchState"]
-
-def load_templates(template_folder):
-    """ 加载指定文件夹内的所有模板 """
+# 使用LRU缓存避免重复读取模板
+@lru_cache(maxsize=32)
+def load_templates_cached(template_folder):
+    """缓存模板加载结果"""
     templates = []
-    for file in os.listdir(template_folder):
+    for file in sorted(os.listdir(template_folder)):
         path = os.path.join(template_folder, file)
-        template = cv2.imread(path, 0)  # 读取为灰度图
+        template = cv2.imread(path, 0)
         if template is not None:
-            templates.append(template)
+            templates.append((file, template))
     return templates
 
-def match_game_state(state, screen, templates, threshold=0.6):
-    """
-    在屏幕截图中匹配一组模板，并返回最佳匹配的状态
-    :param screen: 游戏当前屏幕截图（灰度）
-    :param templates: 模板图像列表
-    :param threshold: 匹配阈值
-    :return: 是否匹配上
-    """
+class GameRunStateDetector:
+    def __init__(self):
+        # 多线程执行器
+        self.executor = ThreadPoolExecutor(max_workers=4)
+        
+        # 预加载所有模板结构
+        self.template_cache = {}
+        for state, folder in profile["Templates"].items():
+            self.template_cache[state] = load_templates_cached(folder)
+        
+        # 共享状态锁
+        self.lock = threading.Lock()
+        self.current_screen = None
+        self.best_scores = {}
 
-    best_score = 0
-    for template in templates:
-        img = cv2.imread(screen, 0)
-        result = cv2.matchTemplate(img, template, cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        best_score = max(best_score, max_val)
-    # 将最佳匹配度写入profile.json
-    with open("Data/json/profile.json", "w", encoding="utf-8") as f:
-        profile["BestMatchState"][state] = best_score
-        json.dump(profile, f)
-    return best_score
+    def _parallel_match(self, state, screen_gray):
+        """并行匹配单个游戏状态"""
+        best_score = 0
+        for file, template in self.template_cache[state]:
+            try:
+                result = cv2.matchTemplate(screen_gray, template, cv2.TM_CCOEFF_NORMED)
+                _, max_val, _, _ = cv2.minMaxLoc(result)
+                if max_val > best_score:
+                    best_score = max_val
+                    # 提前终止阈值
+                    if best_score > 0.95:
+                        break
+            except cv2.error:
+                continue
+        
+        with self.lock:
+            self.best_scores[state] = best_score
 
-def get_game_state(screen):
-    # 加载所有模板
-    game_states = {}
-    for state, folder in profile["Templates"].items():
-        game_states[state] = load_templates(folder)
+    def _update_profile(self):
+        """批量更新配置文件"""
+        with self.lock:
+            profile["BestMatchState"].update(self.best_scores)
+            with open("Data/json/profile.json", "w", encoding="utf-8") as f:
+                json.dump(profile, f, ensure_ascii=False, indent=2)
 
-    # 遍历所有游戏状态，检测当前游戏状态
-    for state, templates in game_states.items():
-        print(f"检测游戏状态: {state}")
-        match_game_state(state, screen, templates, threshold=0.6)
-
-    # 获取最佳匹配状态
-    game_state = max(best_match_state, key=best_match_state.get)
-    print(best_match_state)
-    if best_match_state["result_screen"] > 0.9:
-        game_state = "result_screen"
-
-    print(f"最佳匹配状态: {game_state}")
-
-    return game_state
-
+    def get_game_state(self, screen_path):
+        """优化后的游戏状态检测"""
+        # 单次读取屏幕截图
+        screen_gray = cv2.imread(screen_path, 0)
+        if screen_gray is None:
+            return "error"
+        
+        # 多线程并行匹配
+        futures = []
+        self.best_scores.clear()
+        for state in profile["Templates"]:
+            future = self.executor.submit(
+                self._parallel_match, state, screen_gray
+            )
+            futures.append(future)
+        
+        # 等待所有任务完成
+        for future in futures:
+            future.result()
+        
+        # 批量更新配置
+        self._update_profile()
+        
+        # 快速决策
+        best_state = max(self.best_scores, key=self.best_scores.get)
+        if self.best_scores.get("result_screen", 0) > 0.9:
+            best_state = "result_screen"
+        
+        return best_state

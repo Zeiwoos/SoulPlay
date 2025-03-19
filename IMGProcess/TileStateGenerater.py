@@ -2,7 +2,6 @@ import os
 import json
 import cv2
 import numpy as np
-import shutil
 from tqdm import tqdm
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
@@ -25,28 +24,6 @@ def find_subfolders_with_suffix_scandir(parent_folder, filename):
                 folder_list[suffix] = entry.name
     return folder_list
 
-# 删除SceenShotPath、Split_FinalPath、Split_FirstPath下所有文件
-def delete_folders():
-    Path_list = ["ScreenShotPath", "Split_FinalPath", "Split_FirstPath"]
-    # Path_list = ["Split_FinalPath", "Split_FirstPath"]
-    for folder in Path_list:
-        target_dir = profile['PATH'][folder]
-        
-        # 确保路径存在
-        if not os.path.exists(target_dir):
-            continue
-                
-        # 遍历目录内容
-        for entry in os.listdir(target_dir):
-            full_path = os.path.join(target_dir, entry)
-                
-            try:
-                if os.path.isfile(full_path) or os.path.islink(full_path):
-                    os.remove(full_path)  # 删除文件或符号链接
-                elif os.path.isdir(full_path):
-                    shutil.rmtree(full_path)  # 递归删除目录
-            except Exception as e:
-                print(f"删除 {full_path} 失败，错误：{e}")
 class GameStateGenerator(BatchClassifier):
     """
     游戏状态生成器
