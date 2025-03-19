@@ -3,7 +3,7 @@ import time
 import psutil
 import threading
 from ImageProcess import check_path
-from ScreenShotController.ScreenShot import GameScreenCapturer
+from ScreenShot import GameScreenCapturer
 from IMGProcess.TileStateGenerater import delete_folders
 import sys
 sys.stdout.reconfigure(encoding='utf-8')

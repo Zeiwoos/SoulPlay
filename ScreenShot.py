@@ -9,7 +9,7 @@ import pygetwindow as gw
 import sys
 import ctypes
 from ImageProcess import ImageDetection
-from GameStatusDetect.GameRunStateTest import get_game_state
+from GameRunStateTest import get_game_state
 from IMGProcess.TileStateGenerater import delete_folders
 # 读取配置文件
 with open("Data/json/profile.json", "r", encoding="utf-8") as f:
