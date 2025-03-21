@@ -1,17 +1,17 @@
 import os
 import cv2
 import json
-import threading
 from concurrent.futures import ThreadPoolExecutor
 from functools import lru_cache, partial
 from IMGProcess import *
 from IMGProcess.TileStateGenerater import GameStateGenerator
-from IMGProcess.DrawPic import safe_rect
+from IMGProcess.DrawPic import safe_rect, draw_regions
 from IMGProcess.FirstSplit import recognize_word, find_all_cards_in_region
 from IMGProcess.FinalSplit import process_folder
 from IMGProcess.ActorDetector import detect_actor
 from IMGProcess.Split import save_cropped_regions
 import paddleocr
+from ActionGenerator import MahjongActionDetector
 
 
 # 预加载配置数据
@@ -24,7 +24,7 @@ PATH_CONFIG = {
     'ScreenShotPath': profile['PATH']['ScreenShotPath'],
     'first_processed': profile['PATH']['Split_FirstPath'],
     'second_processed': profile['PATH']['Split_FinalPath'],
-    'game_state': profile['PATH']['GameStatePath']
+    'game_state_path': profile['PATH']['GameStatePath']
 }
 
 REGION_CONFIG = {
@@ -40,13 +40,30 @@ def init_ocr():
 # OpenCV优化配置
 cv2.setNumThreads(4)
 
+def WindCoding(wind: str) -> str:
+    """风牌编码"""
+    wind_map = {
+        "東": "1z",
+        "东": "1z",
+        "南": "2z",
+        "西": "3z",
+        "北": "4z"
+    }
+
+    for char in wind_map:
+        if char in wind:
+            return wind_map[char]
+    
+    return None  # 如果没有匹配的风向，返回 None
+
 class ImageProcessor:
     """图像处理流水线"""
-    
-    def __init__(self, is_phone):
-        self.is_phone = is_phone
-        self.regions, self.yellow_regions = REGION_CONFIG['phone' if is_phone else 'pc']
+    def __init__(self):
+        self.is_phone = None
+        self.regions, self.yellow_regions = None, None
         self.ocr = init_ocr()
+        self.GameState = None
+        self.MahjongActionDetector = MahjongActionDetector()
         
     def process(self, img_path):
         """处理单个图像的全流程"""
@@ -61,30 +78,36 @@ class ImageProcessor:
             
             # 阶段2：并行处理独立任务
             with ThreadPoolExecutor(max_workers=3) as executor:
-                # 风牌识别
-                wind_future = executor.submit(self._process_wind, img, h, w)
-                # 行动人检测
-                actor_future = executor.submit(detect_actor, img, self.yellow_regions)
+                # 字风识别
+                self_wind_future = executor.submit(self._process_wind, img, h, w, "Self_Wind")
+                field_wind_future = executor.submit(self._process_wind, img, h, w, "Field_Wind")
+
+                # # 行动人检测
+                # actor_future = executor.submit(detect_actor, img, self.yellow_regions)
+
                 # 区域处理
                 region_future = executor.submit(find_all_cards_in_region, img, self.regions)
-                
-                text_wind = wind_future.result()
-                is_actor, yellow = actor_future.result()
+
+                # is_actor, yellow = actor_future.result()
                 hand_regions = region_future.result()
-                print(f"处理 {img_path} 完成\n风牌:{text_wind}，行动人:{is_actor}")
-            
+                text_self_wind, text_field_wind = self_wind_future.result(), field_wind_future.result()
+ 
             # 阶段3：顺序处理依赖任务
-            self._save_and_generate(img, hand_regions, img_name, is_actor, text_wind)
-            
+            print(text_self_wind,text_field_wind)
+            self._save_and_generate(img, hand_regions, img_name, text_self_wind, text_field_wind)
+
         except Exception as e:
             print(f"处理 {img_path} 失败: {str(e)}")
-    
-    def _process_wind(self, img, h, w):
+
+    def _process_wind(self, img, h, w, wind_type): 
         """风牌识别专用方法"""
-        rect = safe_rect(self.regions['Wind']['rect'], h, w)
-        return recognize_word(img[rect[1]:rect[3], rect[0]:rect[2]])
+        Wind = safe_rect(self.regions[wind_type]['rect'], h, w)
+
+        roi = img[Wind[1]:Wind[3], Wind[0]:Wind[2]]
+
+        return recognize_word(roi)
     
-    def _save_and_generate(self, img, regions, img_name, is_actor, text_wind):
+    def _save_and_generate(self, img, regions, img_name:str, text_self_wind:list, text_field_wind:list):
         """保存结果并生成游戏状态"""
         # 并行保存操作
         with ThreadPoolExecutor(max_workers=2) as io_executor:
@@ -100,46 +123,24 @@ class ImageProcessor:
             )
         
         # 生成游戏状态
-        generator = GameStateGenerator(os.path.splitext(img_name)[0])
-        generator.save_game_state(PATH_CONFIG['game_state'])
+        generator = GameStateGenerator(os.path.splitext(img_name)[0], WindCoding(text_self_wind[0]), WindCoding(text_field_wind[0]), self.GameState)
 
-def batch_processor(img_folder):
-    """批量处理优化"""
-    # 收集所有待处理文件路径
-    file_paths = []
-    for root, _, files in os.walk(img_folder):
-        file_paths.extend(
-            os.path.join(root, f) for f in files 
-            if f.lower().endswith(('png', 'jpg', 'jpeg'))
-        )
-    
-    # 按设备类型分组处理
-    phone_files = []
-    pc_files = []
-    for path in file_paths:
-        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
-        h, w = img.shape[:2]
-        if max(w, h)/min(w, h) > 2:
-            phone_files.append(path)
-        else:
-            pc_files.append(path)
-    
-    # 并行处理不同设备类型的图片
-    with ThreadPoolExecutor(max_workers=2) as device_executor:
-        device_executor.submit(_process_batch, phone_files, True)
-        device_executor.submit(_process_batch, pc_files, False)
+        game_state = generator.save_game_state(PATH_CONFIG['game_state_path'])
 
-def _process_batch(file_paths, is_phone):
-    """批量处理同类型设备图片"""
-    processor = ImageProcessor(is_phone)
-    with ThreadPoolExecutor(max_workers=os.cpu_count()//2) as executor:
-        executor.map(processor.process, file_paths)
+        # 生成麻将行动
+        self.MahjongActionDetector.process(game_state)
 
-def ImageDetection(filename):
+    def update(self, is_phone:bool, GameState:str)-> None:
+        """更新配置"""
+        self.is_phone = is_phone
+        self.regions, self.yellow_regions = REGION_CONFIG['phone' if is_phone else 'pc']
+        self.GameState = GameState
+
+def ImageDetection(filename:str, ImageProcessor:ImageProcessor, GameState:str)-> None:
     """单图片处理优化"""
     img_path = os.path.join(PATH_CONFIG['ScreenShotPath'], filename)
     img = cv2.imread(img_path)
     h, w = img.shape[:2]
     
-    processor = ImageProcessor(max(w, h)/min(w, h) > 2)
-    processor.process(img_path)
+    ImageProcessor.update(max(w, h)/min(w, h) > 2, GameState)
+    ImageProcessor.process(img_path)

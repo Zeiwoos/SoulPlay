@@ -12,7 +12,7 @@ with open("Data/json/profile.json", "r", encoding="utf-8") as f:
 
 # 使用LRU缓存避免重复读取模板
 @lru_cache(maxsize=32)
-def load_templates_cached(template_folder):
+def load_templates_cached(template_folder:str) -> list:
     """缓存模板加载结果"""
     templates = []
     for file in sorted(os.listdir(template_folder)):
@@ -36,8 +36,9 @@ class GameRunStateDetector:
         self.lock = threading.Lock()
         self.current_screen = None
         self.best_scores = {}
+        self.last_state = None
 
-    def _parallel_match(self, state, screen_gray):
+    def _parallel_match(self, state:str, screen_gray:np.ndarray)-> None:
         """并行匹配单个游戏状态"""
         best_score = 0
         for file, template in self.template_cache[state]:
@@ -46,9 +47,7 @@ class GameRunStateDetector:
                 _, max_val, _, _ = cv2.minMaxLoc(result)
                 if max_val > best_score:
                     best_score = max_val
-                    # 提前终止阈值
-                    if best_score > 0.95:
-                        break
+
             except cv2.error:
                 continue
         
@@ -62,32 +61,57 @@ class GameRunStateDetector:
             with open("Data/json/profile.json", "w", encoding="utf-8") as f:
                 json.dump(profile, f, ensure_ascii=False, indent=2)
 
-    def get_game_state(self, screen_path):
+    def get_game_state(self, screen_path:str)-> tuple:
         """优化后的游戏状态检测"""
-        # 单次读取屏幕截图
         screen_gray = cv2.imread(screen_path, 0)
         if screen_gray is None:
-            return "error"
-        
-        # 多线程并行匹配
+            return "error", "Unknown"  # 确保返回两个值
+
         futures = []
         self.best_scores.clear()
         for state in profile["Templates"]:
-            future = self.executor.submit(
-                self._parallel_match, state, screen_gray
-            )
+            future = self.executor.submit(self._parallel_match, state, screen_gray)
             futures.append(future)
-        
-        # 等待所有任务完成
+
         for future in futures:
             future.result()
-        
-        # 批量更新配置
+
         self._update_profile()
-        
-        # 快速决策
-        best_state = max(self.best_scores, key=self.best_scores.get)
-        if self.best_scores.get("result_screen", 0) > 0.9:
-            best_state = "result_screen"
-        
-        return best_state
+
+        MatchState = max(self.best_scores, key=self.best_scores.get)
+
+        # 预设 game_state，防止未赋值错误
+        GameState = "Unknown"
+
+        # 结果界面或暂停界面优先处理
+        if self.best_scores.get("ResultScreen", 0) > 0.9:
+            MatchState = "ResultScreen"
+        elif self.best_scores.get("Pause", 0) > 0.9:
+            MatchState = "Pause"
+
+        # 逻辑状态转换
+        if self.last_state is None:
+            if MatchState == "MainMenu":
+                GameState = "MainMenu"
+            elif MatchState == "Matching":
+                GameState = "Matching"
+            elif MatchState == "INGame":
+                GameState = "GameStart"
+            elif MatchState == "ResultScreen":
+                GameState = "GameEnd"
+        else:
+            if self.last_state == "MainMenu" and MatchState == "Matching":
+                GameState = "Matching"
+            elif self.last_state in ["Matching", "MainMenu"] and MatchState == "INGame":
+                GameState = "GameStart"
+            elif self.last_state == "INGame" and MatchState == "INGame":
+                GameState = "GameRunning"
+            elif self.last_state in ["INGame", "Matching"] and MatchState == "ResultScreen":
+                GameState = "GameEnd"
+            elif self.last_state == "ResultScreen" and MatchState == "MainMenu":
+                GameState = "MainMenu"
+
+        self.last_state = MatchState
+
+        return MatchState, GameState
+

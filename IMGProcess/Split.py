@@ -2,7 +2,8 @@ import os
 import cv2
 import numpy as np
 
-def save_cropped_regions(img, hand_regions, img_name, output_folder):
+def save_cropped_regions(img:np.ndarray, hand_regions:dict, img_name:str, output_folder:str)-> str:
+    """保存裁剪后的区域"""
     base_name = os.path.splitext(img_name)[0]
     save_path = os.path.join(output_folder, base_name)
     os.makedirs(save_path, exist_ok=True)

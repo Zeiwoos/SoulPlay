@@ -1,0 +1,52 @@
+# 麻将动作监测日志
+{"state": "MyAction", "tile": "9m", "getTile": "3s", "doras": ["3s"]}
+{"state": "Discard", "seat": 1, "tile": "6s", "doras": ["3s"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 2, "tile": "9p", "doras": ["3s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "1p", "getTile": "1p", "doras": ["3s"]}
+{"state": "MyAction", "tile": "8m", "getTile": "8m", "doras": ["3s"]}
+{"state": "Discard", "seat": 1, "tile": "4z", "doras": ["3s"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 2, "tile": "1p", "doras": ["3s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "4z", "getTile": "1z", "doras": ["5z"]}
+{"state": "MyAction", "tile": "5z", "getTile": "6z", "doras": ["5z"]}
+{"state": "Discard", "seat": 2, "tile": "8m", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 3, "tile": "2m", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 1, "tile": "1s", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 2, "tile": "9s", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 3, "tile": "7z", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "3m", "getTile": "3m", "doras": ["5z"]}
+{"state": "Discard", "seat": 3, "tile": "1z", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "1z", "getTile": "1z", "doras": ["5z"]}
+{"state": "MyAction", "tile": "6z", "getTile": "6z", "doras": ["5z"]}
+{"state": "Discard", "seat": 2, "tile": "9s", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 3, "tile": "2p", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "2p", "getTile": "2p", "doras": ["5z"]}
+{"state": "Discard", "seat": 2, "tile": "8p", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "4p", "getTile": "6z", "doras": ["5z"]}
+{"state": "Discard", "seat": 1, "tile": "9p", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 2, "tile": "6p", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "6z", "getTile": "4s", "doras": ["5z"]}
+{"state": "Discard", "seat": 1, "tile": "4z", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "8s", "getTile": "8s", "doras": ["5z"]}
+{"state": "Discard", "seat": 1, "tile": "4s", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 1, "tile": "4m", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "4m", "getTile": "4m", "doras": ["5z"]}
+{"state": "MyAction", "tile": "8s", "getTile": "8s", "doras": ["5z"]}
+{"state": "Discard", "seat": 1, "tile": "3m", "doras": ["5z"], "operation": {"type": 1}}
+{"state": "Unknown"}
+{"state": "Discard", "seat": 3, "tile": "9p", "doras": ["5s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "2p", "getTile": "8s", "doras": ["5s"]}
+{"state": "MyAction", "tile": "1s", "getTile": "6p", "doras": ["5s"]}
+{"state": "Discard", "seat": 1, "tile": "8m", "doras": ["5s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "5z", "getTile": "5z", "doras": ["5s"]}
+{"state": "MyAction", "tile": "1s", "getTile": "1s", "doras": ["5s"]}
+{"state": "MyAction", "tile": "4z", "getTile": "4z", "doras": ["5s"]}
+{"state": "Discard", "seat": 1, "tile": "2s", "doras": ["5s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "3z", "getTile": "0m", "doras": ["5s"]}
+{"state": "Discard", "seat": 1, "tile": "9p", "doras": ["5s"], "operation": {"type": 1}}
+{"state": "Discard", "seat": 3, "tile": "5p", "doras": ["5s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "6p", "getTile": "8s", "doras": ["5s"]}
+{"state": "Discard", "seat": 2, "tile": "3p", "doras": ["5s"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "5m", "getTile": "4p", "doras": ["1p"]}
+{"state": "Discard", "seat": 1, "tile": "1z", "doras": ["1p"], "operation": {"type": 1}}
+{"state": "MyAction", "tile": "5p", "getTile": "5p", "doras": ["1p"]}
+{"state": "Discard", "seat": 1, "tile": "8s", "doras": ["1p"], "operation": {"type": 1}}

@@ -1,0 +1,83 @@
+{
+  "state": "GameRunning",
+  "FieldWind": "1z",
+  "SelfWind": "2z",
+  "seatList": [
+    1,
+    2,
+    3,
+    17457800
+  ],
+  "tiles": {
+    "Hand_Tiles": [
+      "5z",
+      "8s",
+      "7m",
+      "7m",
+      "1m",
+      "7s",
+      "5z",
+      "6s",
+      "5s",
+      "4s",
+      "2s",
+      "4p",
+      "2p",
+      "1p",
+      "1p"
+    ],
+    "Second_Mingpai": [
+      "5p",
+      "4p",
+      "0m"
+    ],
+    "Fourth_Mingpai": [
+      "6m",
+      "4m",
+      "0m",
+      "2z",
+      "2z",
+      "2z"
+    ],
+    "Self_Discard": [
+      "8m",
+      "4p",
+      "5m",
+      "7z",
+      "1s",
+      "3z",
+      "1s"
+    ],
+    "Second_Discard": [
+      "3z",
+      "9p",
+      "8s",
+      "3s",
+      "6s",
+      "1z",
+      "9s",
+      "7z"
+    ],
+    "Third_Discard": [
+      "9m",
+      "4z",
+      "6m",
+      "3s",
+      "7p",
+      "9s"
+    ],
+    "Fourth_Discard": [
+      "9m",
+      "2m",
+      "5s",
+      "3z",
+      "6z",
+      "9s",
+      "3z",
+      "6m"
+    ]
+  },
+  "doras": [
+    "1p"
+  ]
+}

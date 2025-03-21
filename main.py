@@ -7,7 +7,7 @@ import threading
 import shutil
 import pygetwindow as gw
 from concurrent.futures import ThreadPoolExecutor
-from ScreenShot import HighQualityCapturer
+from GameScreenShot import HighQualityCapturer
 
 sys.stdout.reconfigure(encoding="utf-8")
 
@@ -15,19 +15,18 @@ sys.stdout.reconfigure(encoding="utf-8")
 with open("Data/json/profile.json", "r", encoding="utf-8") as f:
     profile = json.load(f)
 
-# 检测路径是否存在
 def check_path(paths):
+    """检查路径是否存在，不存在则创建"""
+    print("📂 正在检查路径...")
     for key, path in paths.items():
         if not os.path.exists(path):
             print(f"⚠️  路径 {path} 不存在，正在创建...")
             os.makedirs(path, exist_ok=True)
-        else:
-            print(f"✅ 路径 {path} 存在")
+    print("📂 路径检查完毕")
 
-
-# **优化后的清空文件夹**
 def clear_folders():
     """并行删除 ScreenShotPath、Split_FinalPath、Split_FirstPath 目录下的所有文件"""
+    print("🗑️ 正在清空目录...")
     path_list = ["ScreenShotPath", "Split_FinalPath", "Split_FirstPath"]
     
     def delete_folder_contents(target_dir):
@@ -40,17 +39,17 @@ def clear_folders():
                     os.remove(full_path)
                 elif os.path.isdir(full_path):
                     shutil.rmtree(full_path)
-            print(f"✅ {target_dir} 清理完成")
         except Exception as e:
             print(f"❌ 清理 {target_dir} 失败，错误：{e}")
 
     with ThreadPoolExecutor() as executor:
         for folder in path_list:
             executor.submit(delete_folder_contents, profile["PATH"].get(folder, ""))
+    print("🗑️ 目录清理完毋")
 
 
 class OptimizedGameMonitor:
-    def __init__(self, capturer):
+    def __init__(self, capturer: HighQualityCapturer):
         self.capturer = capturer
         self.game_name = profile["game_name"]
         self.thread_pool = ThreadPoolExecutor(max_workers=2)
@@ -61,7 +60,7 @@ class OptimizedGameMonitor:
             "window_state": False,
         }
 
-    def _check_process(self):
+    def _check_process(self)-> bool:
         """优化后的进程检测（带缓存）"""
         now = time.time()
         if now - self.cache["process_check"] > 2:  # 2秒缓存
@@ -75,7 +74,7 @@ class OptimizedGameMonitor:
             return False
         return self.last_state
 
-    def _check_window_active(self):
+    def _check_window_active(self)-> bool:
         """窗口激活状态检测（更稳健）"""
         try:
             windows = gw.getWindowsWithTitle(self.game_name)
@@ -99,7 +98,7 @@ class OptimizedGameMonitor:
 
             if game_active != self.last_state:
                 if game_active:
-                    print("🎮 游戏进入活跃状态")
+                    # print("🎮 游戏进入活跃状态")
                     self.capturer.start()
                 else:
                     print("⏸️ 游戏已关闭，停止截图")
@@ -107,7 +106,7 @@ class OptimizedGameMonitor:
                 self.last_state = game_active
                 profile["is_game_running"] = game_active
 
-            time.sleep(2)  # 缩短检测间隔，优化响应速度
+            time.sleep(2) # 降低检测频率
 
     def stop(self):
         """增强停止方法"""
@@ -116,11 +115,10 @@ class OptimizedGameMonitor:
         if threading.current_thread() is not monitor_thread:
             monitor_thread.join(timeout=1)
 
-
 def valueInit():
     """优化初始化流程"""
     global profile
-
+    print("🚀 正在初始化...")
     # 🌟 并行路径检查
     with ThreadPoolExecutor() as executor:
         executor.submit(check_path, profile["PATH"])
@@ -136,7 +134,7 @@ def valueInit():
             "BestMatchState": {k: 0 for k in ["main_menu", "in_game", "result_screen", "matching"]},
         }
     )
-
+    print("🚀 初始化完毕")
 
 if __name__ == "__main__":
     # 🌟 快速初始化
@@ -168,4 +166,4 @@ if __name__ == "__main__":
             if t is not threading.main_thread():
                 t.join(timeout=0.5)
         print("✅ 服务已安全停止")
-        os._exit(0)  # 确保完全退出
+        os._exit(0) 

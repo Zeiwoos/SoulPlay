@@ -1,13 +1,12 @@
 import os
-import json
 import cv2
-import numpy as np
+import json
 from tqdm import tqdm
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict
+from deepdiff import DeepDiff
+from concurrent.futures import ThreadPoolExecutor
 from IMGProcess.BatchClassify import BatchClassifier
-import json
 
 with open("Data/json/profile.json", "r", encoding="utf-8") as f:
     profile = json.load(f)
@@ -28,9 +27,13 @@ class GameStateGenerator(BatchClassifier):
     """
     游戏状态生成器
     """
-    def __init__(self,filename):
+    def __init__(self,filename, self_wind, field_wind, GameState=None):
         super().__init__()
         self.folder_list = find_subfolders_with_suffix_scandir(profile['PATH']['Split_FinalPath'], filename)
+        self.last_game_state = {}
+        self.SelfWind = self_wind
+        self.FieldWind = field_wind
+        self.GameState = GameState
 
     def process_tiles(self) -> List[str]:
         """多线程处理麻将图片"""
@@ -39,9 +42,7 @@ class GameStateGenerator(BatchClassifier):
         for key, folder in self.folder_list.items():
             if key == "Dora_Indicator":
                 continue
-            print(key,folder)
             tile_images = f"{profile['PATH']['Split_FinalPath']}/{folder}"
-            print(tile_images)
             # 多线程处理
             futures = []
             with ThreadPoolExecutor(max_workers=4) as executor:
@@ -119,18 +120,26 @@ class GameStateGenerator(BatchClassifier):
     def generate_game_state(self) -> Dict:
         """生成游戏状态JSON结构"""
         return {
-            "id": -1,
-            "state": "GameStart",
-            "seatList": [1, 2, 3, 17457800],  # 需根据实际游戏数据修改
+            "state": self.GameState,
+            "FieldWind": self.FieldWind,   # 东南西北
+            "SelfWind": self.SelfWind,
+            "seatList": [1, 2, 3, 17457800],  # 座位顺序始终为东南西北（1Z,2Z,3Z,4Z）
             "tiles": self.process_tiles(),
-            "doras": self.recognize_dora()  # 使用真实宝牌
+            "doras": self.recognize_dora()
         }
 
     def save_game_state(self, output_path: str):
         """保存游戏状态到JSON文件"""
         game_state = self.generate_game_state()
-        
+
+        if not game_state:
+            print("❌ 未生成游戏状态")
+            return None
+        print(f"🀄️ 生成游戏状态：{game_state}")
+
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(game_state, f, indent=2, ensure_ascii=False)
             
         print(f"游戏状态已保存至：{os.path.abspath(output_path)}")
+
+        return game_state

@@ -71,16 +71,14 @@ if __name__ == '__main__':
     # 改为对文件夹操作
     img = cv2.imread(first_processed_img_folder + 'PC/pc3/pc3_Fourth_Mingpai.png')  # 请替换为实际图片路径
     tiles, img_with_boxes = extract_tiles(img)
-    print(len(tiles))
     
     # 显示带框的原图
     cv2.imshow('Detected Mahjong Tiles', img_with_boxes)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     
-    print(f"麻将牌分割完成，共 {len(tiles)} 张麻将牌。")
     # 保存切割出的麻将牌图像
     for i, tile in enumerate(tiles):
         tile_path = second_processed_img_folder + f'{i}.png'
         cv2.imwrite(tile_path, tile)
-    print(f"麻将牌分割完成，共 {len(tiles)} 张麻将牌。")
+

@@ -23,7 +23,7 @@ class BatchClassifier:
         except Exception as e:
             return filename, f"error: {str(e)}"
 
-    def process_folder(self, input_folder, output_file="results.csv", max_workers=4):
+    def process_folder(self, input_folder:str, output_file="results.csv", max_workers=4)-> None:
         """
         多线程处理整个文件夹
         :param input_folder: 输入文件夹路径

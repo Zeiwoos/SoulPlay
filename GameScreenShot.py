@@ -9,7 +9,7 @@ import sys
 import ctypes
 import queue
 from PIL import Image
-from ImageProcess import ImageDetection
+from ImageProcess import ImageDetection,ImageProcessor
 from GameRunStateTest import GameRunStateDetector
 
 # 🌟 预加载配置
@@ -25,7 +25,7 @@ class HighQualityCapturer:
         self.cfg = {
             'interval': profile['ScreenShotInterval'],
             'output_dir': profile['PATH']['ScreenShotPath'],
-            'max_files': 1000,
+            'max_files': 2000,  # 限制最大文件数
             'game_title': profile['GameWindowTitle_CN'],
             'retry_limit': profile['Retry_Count']
         }
@@ -35,12 +35,13 @@ class HighQualityCapturer:
         self.capture_thread = None
         self.process_running = True  # 独立控制处理线程
         self.window_cache = {'last_check': 0, 'region': None}
-        self.task_queue = queue.Queue(maxsize=10)  # 控制内存占用
+        self.task_queue = queue.Queue(maxsize=20)  # 控制内存占用
         
         # 🌟 预加载资源
         os.makedirs(self.cfg['output_dir'], exist_ok=True)
         self.detector = GameRunStateDetector()
         self.process_thread = threading.Thread(target=self._process_worker, daemon=True)
+        self.ImageProcessor = ImageProcessor()
         
         # 🌟 性能计数器
         self.counter = {
@@ -49,14 +50,14 @@ class HighQualityCapturer:
             'last_cleanup': 0
         }
 
-    def _init_file_counter(self):
+    def _init_file_counter(self)-> int:
         """优化文件计数器初始化"""
         try:
             return len([f for f in os.listdir(self.cfg['output_dir']) if f.endswith('.png')])
         except:
             return 0
 
-    def _get_window_region(self):
+    def _get_window_region(self) -> tuple:
         """🌟 带缓存的窗口区域获取"""
         now = time.time()
         if now - self.window_cache['last_check'] > 1.0:  # 降低检查频率
@@ -74,7 +75,7 @@ class HighQualityCapturer:
                 print(f"⚠️ 窗口检测异常: {str(e)}")
         return self.window_cache.get('region'), self.window_cache.get('window')
 
-    def _capture_image(self):
+    def _capture_image(self)-> tuple:
         """🌟 高质量截图方法"""
         try:
             region, window = self._get_window_region()
@@ -98,20 +99,22 @@ class HighQualityCapturer:
             print(f"📸 截图失败: {str(e)}")
             return None, None
 
-    def _process_worker(self):
+    def _process_worker(self)-> None:
         """修改后的处理线程"""
         while self.process_running:  # 使用独立控制变量
             try:
                 filepath, filename = self.task_queue.get(timeout=1)
-                if self.detector.get_game_state(filepath) == "in_game":
-                    ImageDetection(filename)
+                MatchState, GameState = self.detector.get_game_state(filepath)
+                if MatchState == "INGame":
+                    ImageDetection(filename, self.ImageProcessor, GameState)
                 self.task_queue.task_done()
             except queue.Empty:
                 continue
             except Exception as e:
                 print(f"处理失败: {e}")
 
-    def _auto_cleanup(self):
+
+    def _auto_cleanup(self)-> None:
         """优化清理逻辑"""
         try:
             files = sorted(os.listdir(self.cfg['output_dir']),
@@ -121,7 +124,7 @@ class HighQualityCapturer:
         except Exception as e:
             print(f"⚠️ 清理失败: {str(e)}")
 
-    def _precision_capture_loop(self):
+    def _precision_capture_loop(self)-> None:
         """🌟 精准间隔捕获循环"""
         next_time = time.time()
         while self.running:
@@ -149,7 +152,7 @@ class HighQualityCapturer:
             else:
                 next_time = time.time()  # 补偿超时
 
-    def start(self):
+    def start(self)-> None:
         """优化启动方法"""
         if not self.running:
             self.running = True
@@ -161,7 +164,7 @@ class HighQualityCapturer:
             self.capture_thread.start()
             print(f"🚀 服务已启动 | 路径: {os.path.abspath(self.cfg['output_dir'])} | 间隔: {self.cfg['interval']}s")
 
-    def stop(self):
+    def stop(self)-> None:
         """优化停止方法"""
         if self.running:
             # 第一步：停止捕获线程

@@ -12,7 +12,6 @@ with open("Data/json/profile.json", "r", encoding="utf-8") as f:
     profile = json.load(f)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(device)
 ModelPath = profile['PATH']['ModelPath']
 
 # CNN输出(int)与牌名(str)的对应关系
@@ -76,7 +75,7 @@ class TileNet(nn.Module):
         self.fc2 = nn.Linear(300, 124)
         self.fc3 = nn.Linear(124, 38)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         x = self.pool(F.relu(self.conv1(x)))
         x = self.pool(F.relu(self.conv2(x)))
         x = x.view(-1, 26 * 5 * 5)
@@ -85,9 +84,7 @@ class TileNet(nn.Module):
         x = self.fc3(x)
         return x
 
-
 class Classify:
-
     def __init__(self):
         self.model = model = TileNet()
         path = os.path.join(os.path.dirname('__file__'), ModelPath)
@@ -98,7 +95,8 @@ class Classify:
         self.model.to(device)
         self.__call__(np.ones((32, 32, 3), dtype=np.uint8))  # load cache
 
-    def __call__(self, img: np.ndarray):
+    def __call__(self, img: np.ndarray)->str:
+        """输入图像，返回牌名"""
         img = transform(CV2PIL(img))
         c, n, m = img.shape
         img = img.view(1, c, n, m).to(device)

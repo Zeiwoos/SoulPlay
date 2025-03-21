@@ -5,7 +5,7 @@ import concurrent.futures
 from functools import partial
 cv2.setNumThreads(4)
 
-def get_mahjongs_contours(img, img_name):
+def get_mahjongs_contours(img:np.ndarray, img_name:str)-> list:
     """
     优化后的轮廓检测函数（向量化+预计算）
     """
@@ -27,7 +27,6 @@ def get_mahjongs_contours(img, img_name):
     for i, cnt in enumerate(contours):
         if hierarchy[0][i][3] != -1 or cv2.contourArea(cnt) < 250:
             continue
-        
         # 快速边界计算
         x, y, w_cnt, h_cnt = cv2.boundingRect(cnt)
         
@@ -42,7 +41,7 @@ def get_mahjongs_contours(img, img_name):
     
     return valid_boxes
 
-def extract_tiles(img, img_name):
+def extract_tiles(img:np.ndarray, img_name:str)-> list:
     """
     优化后的麻将牌提取（列表推导式+并行计算）
     """
@@ -52,7 +51,7 @@ def extract_tiles(img, img_name):
             and (y1:=min(box[:,1])) < (y2:=max(box[:,1]))
             and (x2-x1 > 35 or y2-y1 > 35)]
 
-def load_images(file_paths):
+def load_images(file_paths:list)-> dict:
     """
     预加载所有图像，减少 I/O 读取时间
     """
@@ -63,7 +62,7 @@ def load_images(file_paths):
             images[name] = img
     return images
 
-def process_single_image(img, img_name, output_folder):
+def process_single_image(img:np.ndarray, img_name:str, output_folder:str)-> None:
     """
     处理单个图片，提取麻将牌并保存
     """
@@ -78,9 +77,7 @@ def process_single_image(img, img_name, output_folder):
             tile_path = os.path.join(subfolder_path, f'{i}.png')
             cv2.imwrite(tile_path, tile)
 
-        print(f"处理完成: {img_name}, 生成 {len(tiles)} 张麻将牌。")
-
-def process_folder(input_folder, output_folder):
+def process_folder(input_folder:str, output_folder:str)-> None:
     """
     预加载图像 + 多进程并行处理，提高麻将牌检测速度
     """
