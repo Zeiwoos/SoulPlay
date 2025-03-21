@@ -130,8 +130,8 @@ def valueInit():
     # 🌟 内存中更新配置避免写文件
     profile.update(
         {
-            "is_game_running": False,
-            "BestMatchState": {k: 0 for k in ["main_menu", "in_game", "result_screen", "matching"]},
+            "IsGmeRunning": False,
+            "BestMatchState": {k: 0 for k in ["MainMenu", "INGame", "ResultScreen", "Matching", "Pause"]},
         }
     )
     print("🚀 初始化完毕")

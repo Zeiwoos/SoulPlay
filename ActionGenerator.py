@@ -5,8 +5,10 @@ import json
 import time
 from typing import Dict, List, Optional, Tuple, Set
 
-OUTPUT_FILE = 'Data\\json\\game-state\\Action.txt'
+with open("Data/json/profile.json", "r", encoding="utf-8") as f:
+    profile = json.load(f)
 
+ACTION_FILE = profile['PATH']['ActionPath']
 class MahjongActionDetector:
     def __init__(self):
         self.prev_state = None
@@ -552,7 +554,7 @@ def monitor_json(filename, detector):
         return
 
     print("开始监视文件变化...")
-    with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
+    with open(ACTION_FILE, 'w', encoding='utf-8') as f:
         f.write("# 麻将动作监测日志\n")  # 清空并初始化输出文件
         
     while True:
@@ -571,7 +573,7 @@ def monitor_json(filename, detector):
 
             action = detector.process(curr_data)
             if action and action["state"] != "GameRunning":  # 不输出 GameRunning 状态
-                with open(OUTPUT_FILE, 'a', encoding='utf-8') as f:
+                with open(ACTION_FILE, 'a', encoding='utf-8') as f:
                     f.write(f"{json.dumps(action, ensure_ascii=False)}\n")
                 print(f"检测到动作: {action['state']}")
 

@@ -184,7 +184,7 @@ class HighQualityCapturer:
                     self.task_queue.task_done()
                 except queue.Empty:
                     break
-            
+
             # 第四步：强制终止残留线程
             if self.capture_thread.is_alive() or self.process_thread.is_alive():
                 print("⚠️ 检测到未正常退出的线程，强制终止中...")
