@@ -7,6 +7,5 @@
 # 缓存文件
 __pycache__
 
-
 # 输出文件夹
 Data/recogition/output/* 

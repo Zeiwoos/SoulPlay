@@ -45,16 +45,17 @@ def clear_folders():
     with ThreadPoolExecutor() as executor:
         for folder in path_list:
             executor.submit(delete_folder_contents, profile["PATH"].get(folder, ""))
-    print("🗑️ 目录清理完毋")
+    print("🗑️ 目录清理完成")
 
 
 class OptimizedGameMonitor:
     def __init__(self, capturer: HighQualityCapturer):
         self.capturer = capturer
-        self.game_name = profile["game_name"]
+        self.game_name = profile["GameName"]
         self.thread_pool = ThreadPoolExecutor(max_workers=2)
         self.last_state = False
         self.running = True
+        self.printFlag = False  # 控制打印频率
         self.cache = {
             "process_check": 0,
             "window_state": False,
@@ -88,25 +89,31 @@ class OptimizedGameMonitor:
         while self.running:
             # 🌟 并行检测进程和窗口状态
             process_future = self.thread_pool.submit(self._check_process)
-            window_future = self.thread_pool.submit(self._check_window_active)
+            # window_future = self.thread_pool.submit(self._check_window_active)
 
+            # process_running为进程检测结果，window_active为窗口激活状态
             process_running = process_future.result()
-            window_active = window_future.result()
+            # window_active = window_future.result()
 
             # 🌟 仅检测进程状态（不依赖窗口状态）
             game_active = process_running  
 
             if game_active != self.last_state:
+                # 如果游戏状态发生变化，更新配置文件
                 if game_active:
-                    # print("🎮 游戏进入活跃状态")
                     self.capturer.start()
                 else:
+                    # print("❌ 游戏处于非活跃状态")
                     print("⏸️ 游戏已关闭，停止截图")
                     self.capturer.stop()
                 self.last_state = game_active
                 profile["is_game_running"] = game_active
+            else:
+                if not game_active and not self.printFlag:
+                    print("❌ 游戏处于非活跃状态")
+                    self.printFlag = True
 
-            time.sleep(2) # 降低检测频率
+            time.sleep(10) # 降低检测频率
 
     def stop(self):
         """增强停止方法"""
@@ -139,7 +146,7 @@ def valueInit():
 if __name__ == "__main__":
     # 🌟 快速初始化
     valueInit()
-
+    
     # 🌟 初始化高性能截图器
     capturer = HighQualityCapturer()
 
@@ -151,7 +158,7 @@ if __name__ == "__main__":
     try:
         # 🌟 低功耗等待循环
         while True:
-            time.sleep(5)
+            time.sleep(30)
             # 状态报告
             print(
                 f"📊 当前状态 | 截图队列: {capturer.task_queue.qsize()} | 内存占用: {psutil.Process().memory_info().rss // 1024 // 1024}MB"

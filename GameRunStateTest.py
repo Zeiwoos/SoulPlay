@@ -37,6 +37,7 @@ class GameRunStateDetector:
         self.current_screen = None
         self.best_scores = {}
         self.last_state = None
+        self.GameStateUseful = profile['GameStateUseful']
 
     def _parallel_match(self, state:str, screen_gray:np.ndarray)-> None:
         """并行匹配单个游戏状态"""
@@ -61,7 +62,7 @@ class GameRunStateDetector:
             with open("Data/json/profile.json", "w", encoding="utf-8") as f:
                 json.dump(profile, f, ensure_ascii=False, indent=2)
 
-    def get_game_state(self, screen_path:str)-> tuple:
+    def get_game_state(self, screen_path:str)-> str:
         """优化后的游戏状态检测"""
         screen_gray = cv2.imread(screen_path, 0)
         if screen_gray is None:
@@ -80,6 +81,9 @@ class GameRunStateDetector:
 
         MatchState = max(self.best_scores, key=self.best_scores.get)
 
+        if self.best_scores.get(MatchState, 0) < 0.6:
+            return None
+
         # 预设 game_state，防止未赋值错误
         GameState = "Unknown"
 
@@ -87,10 +91,10 @@ class GameRunStateDetector:
         if self.best_scores.get("ResultScreen", 0) > 0.9:
             MatchState = "ResultScreen"
         elif self.best_scores.get("Pause", 0) > 0.9:
-            MatchState = "Pause"
-
+            return "GamePause"
+        
         # 逻辑状态转换
-        if self.last_state is None:
+        if self.last_state is None or self.GameStateUseful == False:
             if MatchState == "MainMenu":
                 GameState = "MainMenu"
             elif MatchState == "Matching":
@@ -100,18 +104,23 @@ class GameRunStateDetector:
             elif MatchState == "ResultScreen":
                 GameState = "GameEnd"
         else:
-            if self.last_state == "MainMenu" and MatchState == "Matching":
+            if self.last_state in ["MainMenu","ResultScreen"] and MatchState == "MainMenu":
+                GameState = "MainMenu"
+            elif self.last_state in ["MainMenu","Matching","ResultScreen"] and MatchState == "Matching":
                 GameState = "Matching"
-            elif self.last_state in ["Matching", "MainMenu"] and MatchState == "INGame":
+            elif self.last_state in ["MainMenu","Matching","ResultScreen"] and MatchState == "INGame":
                 GameState = "GameStart"
+            elif self.last_state in ["MainMenu","Matching"] and MatchState == "MainMenu" or self.last_state == "Matching" and MatchState=="ResultScreen":
+                GameState = "GameNotRecord"
+            elif self.last_state == "INGame" and MatchState in ["MainMenu","Matching","ResultScreen"]:
+                GameState = "GameEnd"
+            elif self.last_state == "ResultScreen" and MatchState == "ResultScreen":
+                GameState = "GameHadEnd"
             elif self.last_state == "INGame" and MatchState == "INGame":
                 GameState = "GameRunning"
-            elif self.last_state in ["INGame", "Matching"] and MatchState == "ResultScreen":
-                GameState = "GameEnd"
-            elif self.last_state == "ResultScreen" and MatchState == "MainMenu":
-                GameState = "MainMenu"
 
         self.last_state = MatchState
 
-        return MatchState, GameState
+        print(f"图片路径: {screen_path},当前状态: {MatchState}, 逻辑状态: {GameState}")
 
+        return GameState

@@ -6,31 +6,6 @@ import logging
 from IMGProcess.DrawPic import safe_rect
 cv2.setNumThreads(4)
 
-# 预加载 OCR 模型避免重复初始化
-logging.getLogger("ppocr").setLevel(logging.ERROR)
-ocr_instance = paddleocr.PaddleOCR(use_angle_cls=True, lang="ch", show_log=False)
-
-def recognize_word(roi: np.ndarray) -> str:
-    """使用 OCR 识别文字"""
-    results = ocr_instance.ocr(roi, det=False, cls=True)
-
-    # 如果结果为空或不符合预期，返回空字符串
-    if not results or not isinstance(results, list):
-        return ""
-
-    recognized_texts = []
-    for res in results:
-        if isinstance(res, list):
-            for line in res:
-                if isinstance(line, tuple) and len(line) == 2 and isinstance(line[0], str):
-                    recognized_texts.append(line[0])  # 取出文字内容
-                else:
-                    print(f"⚠️ Unexpected OCR result structure: {line}")
-
-    return recognized_texts if recognized_texts else ""
-
-
-
 def find_all_cards_in_region(img:np.ndarray, regions:dict)-> dict:
     """在指定区域内查找所有麻将牌"""
     h_img, w_img = img.shape[:2]
@@ -106,7 +81,8 @@ def find_all_cards_in_region(img:np.ndarray, regions:dict)-> dict:
         return None
     
     with ThreadPoolExecutor() as executor:
-        futures = [executor.submit(process_region, key) for key in regions if key not in ['Self_Wind', 'Field_Wind', 'Hand_Tiles']]
+        futures = [executor.submit(process_region, key) 
+                   for key in regions if key not in ['Self_Wind', 'Field_Wind', 'Hand_Tiles']]
         for future in futures:
             result = future.result()
             if result:

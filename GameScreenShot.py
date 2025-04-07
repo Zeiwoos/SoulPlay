@@ -12,38 +12,39 @@ from PIL import Image
 from ImageProcess import ImageDetection,ImageProcessor
 from GameRunStateTest import GameRunStateDetector
 
-# 🌟 预加载配置
+# 预加载配置
 with open("Data/json/profile.json", "r", encoding="utf-8") as f:
     profile = json.load(f)
 
 class HighQualityCapturer:
     def __init__(self):
-        # 🌟 硬件加速配置
+        # 硬件加速配置
         ctypes.windll.shcore.SetProcessDpiAwareness(2) if hasattr(ctypes.windll, 'shcore') else ctypes.windll.user32.SetProcessDPIAware()
         
-        # 🌟 配置参数
+        # 配置参数
         self.cfg = {
             'interval': profile['ScreenShotInterval'],
             'output_dir': profile['PATH']['ScreenShotPath'],
-            'max_files': 2000,  # 限制最大文件数
+            'max_files': profile['MaxScreenShotCount'],  # 限制最大文件数
             'game_title': profile['GameWindowTitle_CN'],
             'retry_limit': profile['Retry_Count']
         }
         
-        # 🌟 状态控制
+        # 状态控制
         self.running = False
         self.capture_thread = None
+        self.isWindowActive = True  # 窗口激活状态
         self.process_running = True  # 独立控制处理线程
         self.window_cache = {'last_check': 0, 'region': None}
-        self.task_queue = queue.Queue(maxsize=20)  # 控制内存占用
+        self.task_queue = queue.Queue(maxsize=profile['MaxQueueCount'])  # 控制内存占用
         
-        # 🌟 预加载资源
+        # 预加载资源
         os.makedirs(self.cfg['output_dir'], exist_ok=True)
         self.detector = GameRunStateDetector()
         self.process_thread = threading.Thread(target=self._process_worker, daemon=True)
         self.ImageProcessor = ImageProcessor()
         
-        # 🌟 性能计数器
+        # 性能计数器
         self.counter = {
             'total': self._init_file_counter(),
             'start_time': time.time(),
@@ -57,8 +58,8 @@ class HighQualityCapturer:
         except:
             return 0
 
-    def _get_window_region(self) -> tuple:
-        """🌟 带缓存的窗口区域获取"""
+    def _get_window_region(self) -> tuple[tuple[int, int, int, int], object]:
+        """带缓存的窗口区域获取"""
         now = time.time()
         if now - self.window_cache['last_check'] > 1.0:  # 降低检查频率
             try:
@@ -75,15 +76,22 @@ class HighQualityCapturer:
                 print(f"⚠️ 窗口检测异常: {str(e)}")
         return self.window_cache.get('region'), self.window_cache.get('window')
 
-    def _capture_image(self)-> tuple:
-        """🌟 高质量截图方法"""
+    def _capture_image(self)-> str:
+        """高质量截图方法"""
         try:
             region, window = self._get_window_region()
             if not region or not window.isActive or not window:
-                print("🚨窗口未激活，跳过截图")
-                return None, None
+                if self.isWindowActive:
+                    self.isWindowActive = False
+                    print("🚨窗口未激活，跳过截图")
+                    return None
+                else:
+                    # 如果窗口未激活且之前已激活，则不打印警告
+                    return None
+            else:
+                self.isWindowActive = True
             
-            # 🌟 使用更快的内存映射方式
+            # 使用更快的内存映射方式
             img = pyautogui.screenshot(region=region)
             
             # 生成唯一文件名
@@ -91,22 +99,29 @@ class HighQualityCapturer:
             filename = f"game_{timestamp}.png"
             filepath = os.path.join(self.cfg['output_dir'], filename)
             
-            # 🌟 无损保存（压缩级别0）
-            img.save(filepath, format='PNG', compress_level=0)  # 关键修改点
+            # 无损保存（压缩级别0）
+            img.save(filepath, format='PNG', compress_level=0)
             
-            return filepath, filename
+            return filepath
+        
         except Exception as e:
             print(f"📸 截图失败: {str(e)}")
-            return None, None
+            return None
 
     def _process_worker(self)-> None:
         """修改后的处理线程"""
         while self.process_running:  # 使用独立控制变量
             try:
-                filepath, filename = self.task_queue.get(timeout=1)
-                MatchState, GameState = self.detector.get_game_state(filepath)
-                if MatchState == "INGame":
-                    ImageDetection(filename, self.ImageProcessor, GameState)
+                filepath = self.task_queue.get(timeout=1)
+                GameState = self.detector.get_game_state(filepath)
+                if GameState == "GameStart" or GameState == "GameRunning":
+                    self.detector.GameStateUseful = ImageDetection(filepath, self.ImageProcessor, GameState)
+                if GameState == "GameEnd":
+                    # 处理游戏结束状态
+                    BoardState = {'state':"GameEnd"}
+                    with open("./Data/json/board-state/BoardState.json", 'w', encoding='utf-8') as f:
+                        json.dump(BoardState, f, indent=2, ensure_ascii=False)
+
                 self.task_queue.task_done()
             except queue.Empty:
                 continue
@@ -125,26 +140,28 @@ class HighQualityCapturer:
             print(f"⚠️ 清理失败: {str(e)}")
 
     def _precision_capture_loop(self)-> None:
-        """🌟 精准间隔捕获循环"""
+        """精准间隔捕获循环"""
         next_time = time.time()
         while self.running:
             # 执行捕获
-            filepath, filename = self._capture_image()
+            filepath = self._capture_image()
             if filepath:
-                print(f"📸 截图成功: {filename}")
-                self.counter['total'] += 1
-                try:
-                    # 🌟 异步提交处理任务
-                    self.task_queue.put_nowait((filepath, filename))
-                except queue.Full:
-                    print("⚠️ 任务队列已满，跳过处理")
+                # 增加文件校验逻辑
+                if os.path.exists(filepath) and os.path.getsize(filepath) > 0:
+                    print(f"📸 截图成功: {filepath}")
+                    try:
+                        self.task_queue.put_nowait((filepath))
+                    except queue.Full:
+                        print("⚠️ 任务队列已满，跳过处理")
+                else:
+                    print(f"❌ 截图文件 {filepath} 未正确生成")
                 
-                # 🌟 定期清理
+                # 定期清理
                 if time.time() - self.counter['last_cleanup'] > 60:
                     self._auto_cleanup()
                     self.counter['last_cleanup'] = time.time()
 
-            # 🌟 精准间隔控制
+            # 精准间隔控制
             next_time += self.cfg['interval']
             sleep_time = max(0, next_time - time.time())
             if sleep_time > 0:

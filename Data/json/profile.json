@@ -2,7 +2,7 @@
   "PATH": {
     "TestPath": "Data/recogition/IMG/",
     "ScreenShotPath": "Data/recogition/output/screenshots",
-    "BoardStatePath": "Data/json/game-state/game_state.json",
+    "BoardStatePath": "Data/json/board-state/BoardState.json",
     "OutputPath": "Data/recogition/output/",
     "ModelPath": "ModelTrain/recogition/tile.model",
     "Split_FirstPath": "Data/recogition/output/split_first/",
@@ -16,7 +16,9 @@
     "ResultScreen": "Data/templates/result_screen/",
     "Pause": "Data/templates/pause/"
   },
-  "ScreenShotInterval": 2,
+  "ScreenShotInterval": 1.5,
+  "MaxScreenShotCount": 70,
+  "MaxQueueCount": 25,
   "Suffix": {
     "Suffix": [
       "Hand_Tiles",
@@ -457,11 +459,11 @@
     }
   },
   "BestMatchState": {
-    "MainMenu": 0.5340741872787476,
-    "Matching": 0.48457688093185425,
-    "INGame": 0.990059494972229,
-    "ResultScreen": 0.99959397315979,
-    "Pause": 0.3623530864715576
+    "MainMenu": 0.5547124743461609,
+    "Matching": 0.5159472823143005,
+    "INGame": 0.9900597333908081,
+    "ResultScreen": 0.9992274045944214,
+    "Pause": 0.34895989298820496
   },
   "IsGameRunning": false,
   "GameName": "MahjongSoul",
@@ -469,5 +471,5 @@
   "GameWindowTitle_EN": "MahjongSoul",
   "Retry_Count": 5,
   "Retry_Interval": 2,
-  "GameState":""
+  "GameStateUseful": true
 }

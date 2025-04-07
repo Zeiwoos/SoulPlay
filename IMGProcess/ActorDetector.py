@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from IMGProcess.DrawPic import safe_rect
 
-def detect_actor(img:np.ndarray, regions:dict)-> tuple:
+def detect_actor(img:np.ndarray, regions:dict)-> tuple[list[bool], dict]:
     """
     检测黄色高亮区域，判断是否为行动者
     """

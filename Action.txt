@@ -1,52 +1,157 @@
-# 麻将动作监测日志
-{"state": "MyAction", "tile": "9m", "getTile": "3s", "doras": ["3s"]}
-{"state": "Discard", "seat": 1, "tile": "6s", "doras": ["3s"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 2, "tile": "9p", "doras": ["3s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "1p", "getTile": "1p", "doras": ["3s"]}
-{"state": "MyAction", "tile": "8m", "getTile": "8m", "doras": ["3s"]}
-{"state": "Discard", "seat": 1, "tile": "4z", "doras": ["3s"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 2, "tile": "1p", "doras": ["3s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "4z", "getTile": "1z", "doras": ["5z"]}
-{"state": "MyAction", "tile": "5z", "getTile": "6z", "doras": ["5z"]}
-{"state": "Discard", "seat": 2, "tile": "8m", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 3, "tile": "2m", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 1, "tile": "1s", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 2, "tile": "9s", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 3, "tile": "7z", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "3m", "getTile": "3m", "doras": ["5z"]}
-{"state": "Discard", "seat": 3, "tile": "1z", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "1z", "getTile": "1z", "doras": ["5z"]}
-{"state": "MyAction", "tile": "6z", "getTile": "6z", "doras": ["5z"]}
-{"state": "Discard", "seat": 2, "tile": "9s", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 3, "tile": "2p", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "2p", "getTile": "2p", "doras": ["5z"]}
-{"state": "Discard", "seat": 2, "tile": "8p", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "4p", "getTile": "6z", "doras": ["5z"]}
-{"state": "Discard", "seat": 1, "tile": "9p", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 2, "tile": "6p", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "6z", "getTile": "4s", "doras": ["5z"]}
-{"state": "Discard", "seat": 1, "tile": "4z", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "8s", "getTile": "8s", "doras": ["5z"]}
-{"state": "Discard", "seat": 1, "tile": "4s", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 1, "tile": "4m", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "4m", "getTile": "4m", "doras": ["5z"]}
-{"state": "MyAction", "tile": "8s", "getTile": "8s", "doras": ["5z"]}
-{"state": "Discard", "seat": 1, "tile": "3m", "doras": ["5z"], "operation": {"type": 1}}
-{"state": "Unknown"}
-{"state": "Discard", "seat": 3, "tile": "9p", "doras": ["5s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "2p", "getTile": "8s", "doras": ["5s"]}
-{"state": "MyAction", "tile": "1s", "getTile": "6p", "doras": ["5s"]}
-{"state": "Discard", "seat": 1, "tile": "8m", "doras": ["5s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "5z", "getTile": "5z", "doras": ["5s"]}
-{"state": "MyAction", "tile": "1s", "getTile": "1s", "doras": ["5s"]}
-{"state": "MyAction", "tile": "4z", "getTile": "4z", "doras": ["5s"]}
-{"state": "Discard", "seat": 1, "tile": "2s", "doras": ["5s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "3z", "getTile": "0m", "doras": ["5s"]}
-{"state": "Discard", "seat": 1, "tile": "9p", "doras": ["5s"], "operation": {"type": 1}}
-{"state": "Discard", "seat": 3, "tile": "5p", "doras": ["5s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "6p", "getTile": "8s", "doras": ["5s"]}
-{"state": "Discard", "seat": 2, "tile": "3p", "doras": ["5s"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "5m", "getTile": "4p", "doras": ["1p"]}
-{"state": "Discard", "seat": 1, "tile": "1z", "doras": ["1p"], "operation": {"type": 1}}
-{"state": "MyAction", "tile": "5p", "getTile": "5p", "doras": ["1p"]}
-{"state": "Discard", "seat": 1, "tile": "8s", "doras": ["1p"], "operation": {"type": 1}}
+{"state": "GameStart", "seatList": [1, 2, 3, 17457800], "chang": 1, "tiles": ["5z", "4z", "4p", "2p", "1m", "4z", "3z", "6s", "4s", "3s", "3s", "7p", "7p"], "doras": ["3m"]}
+{"state": "Discard", "seat": 1, "tile": "6z"}
+{"state": "Discard", "seat": 2, "tile": "3z"}
+{"state": "Discard", "seat": 3, "tile": "1p"}
+{"state": "MyAction", "tile": "1m", "getTile": "1m"}
+{"state": "Discard", "seat": 1, "tile": "5z"}
+{"state": "Discard", "seat": 2, "tile": "5z"}
+{"state": "Discard", "seat": 3, "tile": "2z"}
+{"state": "MyAction", "tile": "1p", "getTile": "1p"}
+{"state": "Discard", "seat": 1, "tile": "1s"}
+{"state": "Other_Chipongang", "seat": 2, "tile": "1s", "doras": ["3m"], "operation": {"type": 3, "combination": ["1s", "1s", "1s"]}}
+{"state": "Discard", "seat": 2, "tile": "3s"}
+{"state": "Discard", "seat": 3, "tile": "9m"}
+{"state": "MyAction", "tile": "4z", "getTile": "6z"}
+{"state": "Discard", "seat": 1, "tile": "2z"}
+{"state": "Discard", "seat": 2, "tile": "5p"}
+{"state": "Discard", "seat": 3, "tile": "2s"}
+{"state": "MyAction", "tile": "2z", "getTile": "2z"}
+{"state": "Discard", "seat": 1, "tile": "1p"}
+{"state": "Discard", "seat": 2, "tile": "2s"}
+{"state": "Discard", "seat": 3, "tile": "9p"}
+{"state": "MyAction", "tile": "7p", "getTile": "8p"}
+{"state": "Discard", "seat": 1, "tile": "8s"}
+{"state": "Discard", "seat": 2, "tile": "4p"}
+{"state": "Discard", "seat": 3, "tile": "8s"}
+{"state": "MyAction", "tile": "1s", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "9s"}
+{"state": "Discard", "seat": 2, "tile": "4s"}
+{"state": "Discard", "seat": 3, "tile": "1s"}
+{"state": "MyAction", "tile": "7m", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "8m"}
+{"state": "Other_Chipongang", "seat": 2, "tile": "8m", "doras": ["4m"], "operation": {"type": 2, "combination": ["6m", "7m", "8m"]}}
+{"state": "Discard", "seat": 2, "tile": "8s"}
+{"state": "Discard", "seat": 3, "tile": "3p"}
+{"state": "MyAction", "tile": "4s", "getTile": ""}
+{"state": "Other_Chipongang", "seat": 2, "tile": "4s", "doras": ["4m"], "operation": {"type": 3, "combination": ["2z", "2z", "2z"]}}
+{"state": "Other_Chipongang", "seat": 2, "tile": "4s", "doras": ["4m"], "operation": {"type": 2, "combination": ["1m", "2m", "3m"]}}
+{"state": "Discard", "seat": 2, "tile": "6p"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "6p", "doras": ["4m"], "operation": {"type": 5, "combination": ["4z", "4z", "4z", "4z"]}}
+{"state": "Discard", "seat": 1, "tile": "3p"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "3p", "doras": ["4m"], "operation": {"type": 3, "combination": ["2p", "2p", "2p"]}}
+{"state": "Discard", "seat": 1, "tile": "1z"}
+{"state": "Discard", "seat": 2, "tile": "9s"}
+{"state": "Discard", "seat": 3, "tile": "2m"}
+{"state": "MyAction", "tile": "5m", "getTile": "5m"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "5m", "doras": ["4m"], "operation": {"type": 2, "combination": ["7p", "8p", "9p"]}}
+{"state": "Discard", "seat": 1, "tile": "6s"}
+{"state": "Discard", "seat": 2, "tile": "7p"}
+{"state": "Discard", "seat": 3, "tile": "5s"}
+{"state": "MyAction", "tile": "6p", "getTile": "6p"}
+{"state": "Other_Chipongang", "seat": 2, "tile": "6p", "doras": ["5m"], "operation": {"type": 3, "combination": ["3z", "3z", "3z"]}}
+{"state": "Discard", "seat": 2, "tile": "6z"}
+{"state": "Discard", "seat": 3, "tile": "6p"}
+{"state": "MyAction", "tile": "2p", "getTile": "2p"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "2p", "doras": ["5m"], "operation": {"type": 3, "combination": ["3m", "3m", "3m"]}}
+{"state": "MyAction_Chipongang", "seat": 0, "tile": "2p", "doras": ["5m"], "operation": {"type": 3, "combination": ["6z", "6z", "6z"]}}
+{"state": "MyAction", "tile": "9m", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "7m"}
+{"state": "Discard", "seat": 2, "tile": "1p"}
+{"state": "Discard", "seat": 3, "tile": "2p"}
+{"state": "MyAction", "tile": "8s", "getTile": "8s"}
+{"state": "Discard", "seat": 1, "tile": "9m"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "9m", "doras": ["5m"], "operation": {"type": 2, "combination": ["2s", "3s", "4s"]}}
+{"state": "Discard", "seat": 1, "tile": "9p"}
+{"state": "Discard", "seat": 2, "tile": "5s"}
+{"state": "Discard", "seat": 3, "tile": "9s"}
+{"state": "MyAction", "tile": "9s", "getTile": "9s"}
+{"state": "Discard", "seat": 1, "tile": "2m"}
+{"state": "GameEnd"}
+{"state": "GameStart", "seatList": [3, 17457800, 1, 2], "chang": 1, "tiles": ["4z", "3z", "5m", "3m", "2m", "1s", "4p", "3p", "1p", "9m", "7m", "7m", "6m"], "doras": ["4m"]}
+{"state": "Discard", "seat": 3, "tile": "1m"}
+{"state": "MyAction", "tile": "1s", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "8s"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "8s", "doras": ["4m"], "operation": {"type": 3, "combination": ["5z", "5z", "5z"]}}
+{"state": "Discard", "seat": 1, "tile": "9p"}
+{"state": "Discard", "seat": 2, "tile": "5z"}
+{"state": "Discard", "seat": 3, "tile": "9p"}
+{"state": "MyAction", "tile": "6z", "getTile": "7p"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "6z", "doras": ["4m"], "operation": {"type": 3, "combination": ["6z", "6z", "6z"]}}
+{"state": "GameEnd"}
+{"state": "GameStart", "seatList": [3, 17457800, 1, 2], "chang": 1, "tiles": ["7z", "6z", "5m", "4m", "8p", "5z", "4z", "4z", "2z", "4p", "2p", "7m", "7m"], "doras": ["4z"]}
+{"state": "Discard", "seat": 3, "tile": "3z"}
+{"state": "Other_Chipongang", "seat": 2, "tile": "3z", "doras": ["4z"], "operation": {"type": 3, "combination": ["3s", "3s", "3s"]}}
+{"state": "Discard", "seat": 2, "tile": "2p"}
+{"state": "Discard", "seat": 3, "tile": "3m"}
+{"state": "MyAction_Chipongang", "seat": 0, "tile": "3m", "doras": ["4z"], "operation": {"type": 2, "combination": ["3m", "4m", "5m"]}}
+{"state": "MyAction", "tile": "8p", "getTile": "8p"}
+{"state": "Discard", "seat": 1, "tile": "3z"}
+{"state": "Discard", "seat": 2, "tile": "1s"}
+{"state": "Discard", "seat": 3, "tile": "7z"}
+{"state": "MyAction", "tile": "0s", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "4m"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "4m", "doras": ["4z"], "operation": {"type": 3, "combination": ["7p", "7p", "7p"]}}
+{"state": "Discard", "seat": 1, "tile": "3p"}
+{"state": "Discard", "seat": 2, "tile": "5s"}
+{"state": "Discard", "seat": 3, "tile": "7m"}
+{"state": "MyAction_Chipongang", "seat": 0, "tile": "7m", "doras": ["4z"], "operation": {"type": 3, "combination": ["7m", "7m", "7m"]}}
+{"state": "MyAction", "tile": "4s", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "6z"}
+{"state": "Discard", "seat": 2, "tile": "7s"}
+{"state": "MyAction_Chipongang", "seat": 0, "tile": "7s", "doras": ["4z"], "operation": {"type": 3, "combination": ["4z", "4z", "4z"]}}
+{"state": "MyAction", "tile": "5z", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "2s"}
+{"state": "Discard", "seat": 2, "tile": "7z"}
+{"state": "GameEnd"}
+{"state": "GameStart", "seatList": [3, 17457800, 1, 2], "chang": 1, "tiles": ["7z", "7z", "7m", "6m", "3s", "4s", "4s", "4s", "2s", "7p", "6p", "3p", "3p"], "doras": ["4s"]}
+{"state": "Discard", "seat": 3, "tile": "1s"}
+{"state": "MyAction", "tile": "2m", "getTile": "2m"}
+{"state": "Discard", "seat": 1, "tile": "7m"}
+{"state": "Discard", "seat": 2, "tile": "2m"}
+{"state": "Discard", "seat": 3, "tile": "7z"}
+{"state": "MyAction_Chipongang", "seat": 0, "tile": "7z", "doras": ["4s"], "operation": {"type": 3, "combination": ["7z", "7z", "7z"]}}
+{"state": "MyAction", "tile": "7p", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "9p"}
+{"state": "Discard", "seat": 2, "tile": "3z"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "3z", "doras": ["4s"], "operation": {"type": 3, "combination": ["3z", "3z", "3z"]}}
+{"state": "Discard", "seat": 1, "tile": "4m"}
+{"state": "Discard", "seat": 2, "tile": "2z"}
+{"state": "Discard", "seat": 3, "tile": "4p"}
+{"state": "MyAction", "tile": "9m", "getTile": "9m"}
+{"state": "Discard", "seat": 1, "tile": "6s"}
+{"state": "Discard", "seat": 2, "tile": "3s"}
+{"state": "GameEnd"}
+{"state": "GameStart", "seatList": [17457800, 1, 2, 3], "chang": 1, "tiles": ["7z", "6z", "6m", "2m", "3s", "6z", "5z", "1z", "8s", "4s", "1s", "4p", "4p"], "doras": ["6m"]}
+{"state": "Other_Chipongang", "seat": 1, "tile": null, "doras": ["6m"], "operation": {"type": 3, "combination": ["1s", "1s", "1s"]}}
+{"state": "Discard", "seat": 1, "tile": "2p"}
+{"state": "Discard", "seat": 2, "tile": "2s"}
+{"state": "Discard", "seat": 3, "tile": "1m"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "1m", "doras": ["6m"], "operation": {"type": 3, "combination": ["2m", "2m", "2m"]}}
+{"state": "Discard", "seat": 1, "tile": "7z"}
+{"state": "Discard", "seat": 2, "tile": "2p"}
+{"state": "Discard", "seat": 3, "tile": "8m"}
+{"state": "MyAction", "tile": "5z", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "5s"}
+{"state": "Discard", "seat": 2, "tile": "1z"}
+{"state": "Discard", "seat": 3, "tile": "9s"}
+{"state": "MyAction", "tile": "6p", "getTile": "6p"}
+{"state": "Discard", "seat": 1, "tile": "3z"}
+{"state": "Discard", "seat": 2, "tile": "3p"}
+{"state": "Discard", "seat": 3, "tile": "5z"}
+{"state": "MyAction", "tile": "2z", "getTile": "2z"}
+{"state": "Discard", "seat": 1, "tile": "2s"}
+{"state": "Discard", "seat": 2, "tile": "3s"}
+{"state": "Discard", "seat": 3, "tile": "8s"}
+{"state": "MyAction", "tile": "1m", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "9p"}
+{"state": "Discard", "seat": 2, "tile": "8s"}
+{"state": "Other_Chipongang", "seat": 1, "tile": "8s", "doras": ["6m"], "operation": {"type": 3, "combination": ["7p", "7p", "7p"]}}
+{"state": "Discard", "seat": 1, "tile": "4s"}
+{"state": "MyAction_Chipongang", "seat": 0, "tile": "4s", "doras": ["6m"], "operation": {"type": 3, "combination": ["4m", "4m", "4m"]}}
+{"state": "MyAction", "tile": "3p", "getTile": ""}
+{"state": "Discard", "seat": 1, "tile": "8m"}
+{"state": "Discard", "seat": 2, "tile": "4z"}
+{"state": "Discard", "seat": 3, "tile": "3s"}
+{"state": "MyAction", "tile": "4s", "getTile": "4s"}
+{"state": "Other_Chipongang", "seat": 2, "tile": "6s", "doras": ["6m"], "operation": {"type": 4, "combination": ["6s", "6s", "6s", "6s"]}}
+{"state": "GameEnd"}

@@ -5,7 +5,7 @@ import concurrent.futures
 from functools import partial
 cv2.setNumThreads(4)
 
-def get_mahjongs_contours(img:np.ndarray, img_name:str)-> list:
+def get_mahjongs_contours(img:np.ndarray, img_name:str)-> list[np.ndarray]:
     """
     优化后的轮廓检测函数（向量化+预计算）
     """
@@ -41,7 +41,7 @@ def get_mahjongs_contours(img:np.ndarray, img_name:str)-> list:
     
     return valid_boxes
 
-def extract_tiles(img:np.ndarray, img_name:str)-> list:
+def extract_tiles(img:np.ndarray, img_name:str)-> list[np.ndarray]:
     """
     优化后的麻将牌提取（列表推导式+并行计算）
     """
